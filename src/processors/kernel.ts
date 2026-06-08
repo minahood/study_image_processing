@@ -3,7 +3,10 @@
  * カーネルは奇数サイズ（3x3, 5x5 など）の2次元配列。
  * 正規化は呼び出し側の責任（カーネル要素の和が 0 の場合はオフセット 128 を加算しない）。
  */
-export function applyKernel(imageData: ImageData, kernel: number[][]): ImageData {
+export function applyKernel(
+  imageData: ImageData,
+  kernel: readonly (readonly number[])[],
+): ImageData {
   const { width, height, data: src } = imageData
   const out = new Uint8ClampedArray(src.length)
 
