@@ -1,27 +1,105 @@
-import { toneCurveQuizzes } from './quizzes'
-import SourceImageCanvas from './components/SourceImageCanvas'
-import ProcessedImageCanvas from './components/ProcessedImageCanvas'
+import { useState } from 'react'
+import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes } from './quizzes'
+import type { Quiz } from './quizzes'
+import QuizSession from './components/QuizSession'
+import ResultScreen from './components/ResultScreen'
+
+type Screen = 'start' | 'quiz' | 'result'
+
+type Category = {
+  id: string
+  label: string
+  quizzes: Quiz[]
+}
+
+const CATEGORIES: Category[] = [
+  { id: 'all',        label: 'すべて（全13問）',       quizzes: allQuizzes },
+  { id: 'toneCurve',  label: 'トーンカーブ（5問）',     quizzes: toneCurveQuizzes },
+  { id: 'kernel',     label: 'カーネルフィルタ（5問）', quizzes: kernelQuizzes },
+  { id: 'threshold',  label: '二値化・形態学（3問）',   quizzes: thresholdQuizzes },
+]
 
 export default function App() {
-  const quiz = toneCurveQuizzes[0]
+  const [screen, setScreen] = useState<Screen>('start')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [result, setResult] = useState<{ score: number; total: number } | null>(null)
 
+  const activeQuizzes = CATEGORIES.find((c) => c.id === selectedCategory)?.quizzes ?? allQuizzes
+
+  function handleStart() {
+    setResult(null)
+    setScreen('quiz')
+  }
+
+  function handleFinish(score: number, total: number) {
+    setResult({ score, total })
+    setScreen('result')
+  }
+
+  function handleRetry() {
+    setScreen('start')
+  }
+
+  if (screen === 'quiz') {
+    return <QuizSession key={selectedCategory} quizzes={activeQuizzes} onFinish={handleFinish} />
+  }
+
+  if (screen === 'result' && result) {
+    return <ResultScreen score={result.score} total={result.total} onRetry={handleRetry} />
+  }
+
+  // start 画面
   return (
-    <main style={{ fontFamily: 'sans-serif', maxWidth: 720, margin: '0 auto', padding: '2rem' }}>
-      <h1>画像処理クイズサイト</h1>
+    <div style={{ maxWidth: 600, margin: '4rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+        画像処理クイズ
+      </h1>
+      <p style={{ color: '#6b7280', lineHeight: 1.7, marginBottom: '2rem' }}>
+        4択クイズで画像処理の基礎を学ぼう。各問題では処理前・処理後の画像を見比べながら答えられます。
+      </p>
 
-      <p style={{ marginBottom: '1.5rem' }}>{quiz.question}</p>
+      <h2 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.75rem', color: '#374151' }}>
+        カテゴリを選ぶ
+      </h2>
 
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-        <figure style={{ margin: 0 }}>
-          <figcaption style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>元画像</figcaption>
-          <SourceImageCanvas width={200} height={200} />
-        </figure>
-
-        <figure style={{ margin: 0 }}>
-          <figcaption style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>処理後</figcaption>
-          <ProcessedImageCanvas quizId={quiz.id} width={200} height={200} />
-        </figure>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.id)}
+            style={{
+              padding: '0.75rem 1rem',
+              border: `2px solid ${selectedCategory === cat.id ? '#2563eb' : '#d1d5db'}`,
+              borderRadius: '8px',
+              background: selectedCategory === cat.id ? '#eff6ff' : '#fff',
+              color: selectedCategory === cat.id ? '#1d4ed8' : '#374151',
+              fontWeight: selectedCategory === cat.id ? 'bold' : 'normal',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontSize: '0.95rem',
+            }}
+          >
+            {cat.label}
+          </button>
+        ))}
       </div>
-    </main>
+
+      <button
+        onClick={handleStart}
+        style={{
+          width: '100%',
+          padding: '0.875rem',
+          background: '#2563eb',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        }}
+      >
+        開始する →
+      </button>
+    </div>
   )
 }
