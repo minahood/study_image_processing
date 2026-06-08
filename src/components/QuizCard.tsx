@@ -58,7 +58,7 @@ export default function QuizCard({ quiz, onAnswer }: Props) {
       <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', justifyContent: 'center' }}>
         <figure style={{ margin: 0, textAlign: 'center' }}>
           <figcaption style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>元画像</figcaption>
-          <SourceImageCanvas width={200} height={200} />
+          <SourceImageCanvas quizId={quiz.id} width={200} height={200} />
         </figure>
         <figure style={{ margin: 0, textAlign: 'center' }}>
           <figcaption style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>処理後</figcaption>

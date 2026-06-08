@@ -9,6 +9,8 @@ export type Quiz = {
   choices: string[]
   answer: number
   explanation: string
+  /** 出題に使うテスト画像の種類（省略時は 'geometric'） */
+  sourceImage?: string
 }
 
 const CATEGORY = 'トーンカーブ'

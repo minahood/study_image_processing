@@ -6,8 +6,15 @@ import {
   morphology,
 } from '../processors'
 import type { Channel, CurvePoint } from '../processors'
+import {
+  translate,
+  scale,
+  rotate,
+  flipHorizontal,
+  flipVertical,
+} from '../processors/geometric'
+import { generateSourceImage } from '../processors/testImages'
 import { allQuizzes } from '../quizzes'
-import { generateTestImageData } from './SourceImageCanvas'
 
 type Props = {
   quizId: string
@@ -20,13 +27,17 @@ type ToneCurveParams = { channel: Channel; curvePoints: CurvePoint[] }
 type KernelParams = { kernel: readonly (readonly number[])[] }
 type ThresholdParams = { method: 'otsu' | 'fixed'; value?: number }
 type MorphologyParams = { operation: 'dilate' | 'erode'; kernelSize: number }
+type TranslateParams = { dx: number; dy: number }
+type ScaleParams = { sx: number; sy: number }
+type RotateParams = { angleDeg: number; cx?: number; cy?: number }
 
 /**
  * quizId に対応する画像処理をテスト画像に適用して ImageData を返す。
- * クイズ定義から processorFn と params を引き、処理関数で分岐する。
+ * クイズ定義から sourceImage / processorFn / params を引き、処理関数で分岐する。
  */
-function processForQuiz(quizId: string, source: ImageData): ImageData {
+function processForQuiz(quizId: string): ImageData {
   const quiz = allQuizzes.find((q) => q.id === quizId)
+  const source = generateSourceImage(quiz?.sourceImage)
   if (!quiz) return source
 
   switch (quiz.processorFn) {
@@ -48,6 +59,22 @@ function processForQuiz(quizId: string, source: ImageData): ImageData {
       const binary = applyThreshold(source, 'otsu')
       return morphology(binary, p.operation, p.kernelSize)
     }
+    case 'translate': {
+      const p = quiz.params as TranslateParams
+      return translate(source, p.dx, p.dy)
+    }
+    case 'scale': {
+      const p = quiz.params as ScaleParams
+      return scale(source, p.sx, p.sy)
+    }
+    case 'rotate': {
+      const p = quiz.params as RotateParams
+      return rotate(source, p.angleDeg, p.cx, p.cy)
+    }
+    case 'flipHorizontal':
+      return flipHorizontal(source)
+    case 'flipVertical':
+      return flipVertical(source)
     default:
       return source
   }
@@ -69,9 +96,16 @@ export default function ProcessedImageCanvas({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const source = generateTestImageData(width, height)
-    const processed = processForQuiz(quizId, source)
-    ctx.putImageData(processed, 0, 0)
+    const processed = processForQuiz(quizId)
+
+    // 生成画像（200×200）を canvas サイズに合わせて描画
+    const off = document.createElement('canvas')
+    off.width = processed.width
+    off.height = processed.height
+    off.getContext('2d')!.putImageData(processed, 0, 0)
+
+    ctx.clearRect(0, 0, width, height)
+    ctx.drawImage(off, 0, 0, width, height)
   }, [quizId, width, height])
 
   return <canvas ref={canvasRef} width={width} height={height} />

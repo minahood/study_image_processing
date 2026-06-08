@@ -89,6 +89,41 @@ const kernelQuizzes: Quiz[] = [
     explanation:
       'Sobel X は水平方向（左右）の輝度差を計算する微分フィルタです。左右で値が変わる箇所＝垂直なエッジが強く検出されます。',
   },
+  {
+    id: 'k-06',
+    category: CATEGORY,
+    question:
+      '次の 3×3 カーネル（Sobel Y）を画像に適用すると、どうなりますか？\n\n[-1 -2 -1]\n[ 0  0  0]\n[ 1  2  1]',
+    processorFn: 'applyKernel',
+    params: { kernel: KERNELS.sobelY },
+    choices: [
+      '垂直なエッジ（左右の輝度変化）が検出される',
+      '縦方向（上下）の輝度変化＝水平なエッジが検出される',
+      '画像がぼける',
+      '色が反転する',
+    ],
+    answer: 1,
+    explanation:
+      'Sobel Y は垂直方向（上下）の輝度差を計算する微分フィルタです。上下で値が変わる箇所＝水平なエッジが強く検出されます。Sobel X と直交する向きのエッジを拾います。',
+  },
+  {
+    id: 'k-07',
+    category: CATEGORY,
+    question:
+      'チェッカーボード（白黒の市松模様）に平均化フィルタ（ボックスブラー）を適用すると、どうなりますか？',
+    processorFn: 'applyKernel',
+    params: { kernel: KERNELS.boxBlur3 },
+    sourceImage: 'checker',
+    choices: [
+      '市松模様がより鮮明になる',
+      '白マスだけが残り黒マスが消える',
+      'マスの境界がぼやけて灰色がかる',
+      '模様が90度回転する',
+    ],
+    answer: 2,
+    explanation:
+      'ボックスブラーは近傍画素を平均します。白マスと黒マスの境界では両方の色が混ざるため、境界がぼやけて灰色に近づきます。高周波成分（細かい模様）が失われる典型例です。',
+  },
 ]
 
 export default kernelQuizzes
