@@ -1,7 +1,50 @@
-import { useState } from 'react'
-import type { Quiz } from '../quizzes'
+import { useState, useEffect, useRef } from 'react'
+import type { Quiz, QuizChoice } from '../quizzes'
 import SourceImageCanvas from './SourceImageCanvas'
 import ImageChoiceCard from './ImageChoiceCard'
+import { processChoiceAsync } from '../processors/processChoice'
+
+function OutputDisplayCanvas({
+  sourceImage,
+  outputDisplay,
+  width,
+  height,
+}: {
+  sourceImage: string
+  outputDisplay: { processorFn: string; params: object }
+  width: number
+  height: number
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')!
+
+    ctx.fillStyle = '#e5e7eb'
+    ctx.fillRect(0, 0, width, height)
+
+    let cancelled = false
+    const fakeChoice: QuizChoice = {
+      label: '',
+      processorFn: outputDisplay.processorFn,
+      params: outputDisplay.params,
+    }
+    processChoiceAsync(sourceImage, fakeChoice).then((processed) => {
+      if (cancelled) return
+      const off = document.createElement('canvas')
+      off.width = processed.width
+      off.height = processed.height
+      off.getContext('2d')!.putImageData(processed, 0, 0)
+      ctx.clearRect(0, 0, width, height)
+      ctx.drawImage(off, 0, 0, width, height)
+    })
+    return () => { cancelled = true }
+  }, [sourceImage, outputDisplay, width, height])
+
+  return <canvas ref={canvasRef} width={width} height={height} />
+}
 
 type Props = {
   quiz: Quiz
@@ -24,11 +67,19 @@ export default function QuizCard({ quiz, onAnswer }: Props) {
       <p style={{ fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.25rem', whiteSpace: 'pre-wrap' }}>
         {quiz.question}
       </p>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', justifyContent: 'center' }}>
         <figure style={{ margin: 0, textAlign: 'center' }}>
           <figcaption style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>元画像</figcaption>
           <SourceImageCanvas sourceImage={quiz.sourceImage} width={200} height={200} />
         </figure>
+        {quiz.outputDisplay && (
+          <figure style={{ margin: 0, textAlign: 'center' }}>
+            <figcaption style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>処理後</figcaption>
+            <div style={{ filter: answered ? 'none' : 'blur(12px)', transition: 'filter 0.4s', borderRadius: '4px', overflow: 'hidden', display: 'inline-block' }}>
+              <OutputDisplayCanvas sourceImage={quiz.sourceImage} outputDisplay={quiz.outputDisplay} width={200} height={200} />
+            </div>
+          </figure>
+        )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', justifyItems: 'center', marginBottom: '1.5rem' }}>
         {quiz.choices.map((choice, i) => (

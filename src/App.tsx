@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometricQuizzes, realImageQuizzes } from './quizzes'
+import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometricQuizzes, realImageQuizzes, kernelReverseQuizzes } from './quizzes'
 import type { Quiz } from './quizzes'
 import QuizSession from './components/QuizSession'
 import ResultScreen from './components/ResultScreen'
@@ -13,12 +13,13 @@ type Category = {
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'all',        label: 'すべて（全32問）',         quizzes: allQuizzes },
-  { id: 'toneCurve',  label: 'トーンカーブ（5問）',       quizzes: toneCurveQuizzes },
-  { id: 'kernel',     label: 'カーネルフィルタ（7問）',   quizzes: kernelQuizzes },
-  { id: 'threshold',  label: '二値化・形態学（3問）',     quizzes: thresholdQuizzes },
-  { id: 'geometric',  label: '幾何学変換（5問）',         quizzes: geometricQuizzes },
-  { id: 'realImage',  label: 'フリー画像クイズ（12問）',  quizzes: realImageQuizzes },
+  { id: 'all',           label: 'すべて（全39問）',                quizzes: allQuizzes },
+  { id: 'toneCurve',     label: 'トーンカーブ（5問）',              quizzes: toneCurveQuizzes },
+  { id: 'kernel',        label: 'カーネルフィルタ（7問）',          quizzes: kernelQuizzes },
+  { id: 'threshold',     label: '二値化・形態学（3問）',            quizzes: thresholdQuizzes },
+  { id: 'geometric',     label: '幾何学変換（5問）',                quizzes: geometricQuizzes },
+  { id: 'realImage',     label: 'フリー画像クイズ（12問）',         quizzes: realImageQuizzes },
+  { id: 'kernelReverse', label: 'カーネル逆問題（7問）',            quizzes: kernelReverseQuizzes },
 ]
 
 export default function App() {

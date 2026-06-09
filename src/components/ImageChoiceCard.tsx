@@ -16,6 +16,7 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    if (choice.kernelMatrix) return  // skip canvas for text choices
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -47,6 +48,60 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
     : state === 'selected' ? '#2563eb'
     : '#d1d5db'
   const borderWidth = state !== 'idle' ? 3 : 2
+
+  if (choice.kernelMatrix) {
+    const bg = state === 'correct' ? '#dcfce7'
+      : state === 'wrong' ? '#fee2e2'
+      : state === 'selected' ? '#eff6ff'
+      : '#f9fafb'
+
+    return (
+      <div
+        onClick={disabled ? undefined : onClick}
+        style={{
+          position: 'relative',
+          display: 'inline-flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: disabled ? 'default' : 'pointer',
+          border: `${borderWidth}px solid ${borderColor}`,
+          borderRadius: '8px',
+          overflow: 'hidden',
+          width: 150,
+          height: 150,
+          background: bg,
+          padding: '8px',
+          boxSizing: 'border-box',
+        }}
+      >
+        <pre style={{
+          fontSize: '0.65rem',
+          lineHeight: 1.5,
+          margin: 0,
+          fontFamily: 'monospace',
+          whiteSpace: 'pre',
+          color: '#1f2937',
+          textAlign: 'center',
+        }}>
+          {choice.kernelMatrix}
+        </pre>
+        <div style={{
+          position: 'absolute',
+          top: 4,
+          left: 4,
+          background: 'rgba(0,0,0,0.55)',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '0.85rem',
+          padding: '1px 6px',
+          borderRadius: '4px',
+        }}>
+          {choice.label}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div

@@ -3,6 +3,7 @@ export type QuizChoice = {
   processorFn: string
   params: object
   description?: string
+  kernelMatrix?: string
 }
 
 export type Quiz = {
@@ -13,4 +14,8 @@ export type Quiz = {
   choices: QuizChoice[]
   answer: number
   explanation: string
+  outputDisplay?: {
+    processorFn: string
+    params: object
+  }
 }
