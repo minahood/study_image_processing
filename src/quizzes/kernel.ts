@@ -3,158 +3,257 @@ import { KERNELS } from '../processors'
 
 const CATEGORY = 'カーネルフィルタ'
 
+// 移動平均フィルタのカーネル（各要素 1/9 ≈ 0.111）
+const BOX_BLUR_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│  1   1   1   │
+│  1   1   1   │ × 1/9
+│  1   1   1   │
+└───────────────┘`
+
+const GAUSSIAN_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│  1   2   1   │
+│  2   4   2   │ × 1/16
+│  1   2   1   │
+└───────────────┘`
+
+const SHARPEN_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│  0  -1   0   │
+│ -1   5  -1   │
+│  0  -1   0   │
+└───────────────┘`
+
+const SHARPEN8_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│ -1  -1  -1   │
+│ -1   9  -1   │
+│ -1  -1  -1   │
+└───────────────┘`
+
+const LAPLACIAN_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│  0   1   0   │
+│  1  -4   1   │
+│  0   1   0   │
+└───────────────┘`
+
+const SOBEL_X_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│ -1   0   1   │
+│ -2   0   2   │
+│ -1   0   1   │
+└───────────────┘`
+
+const SOBEL_Y_DISPLAY = `以下のカーネルを画像に適用すると、出力はどうなるか？
+
+┌───────────────┐
+│ -1  -2  -1   │
+│  0   0   0   │
+│  1   2   1   │
+└───────────────┘`
+
+// 全方向シャープン（問題文の図5相当）
+const SHARPEN_ALL: readonly (readonly number[])[] = [
+  [-1, -1, -1],
+  [-1,  9, -1],
+  [-1, -1, -1],
+] as const
+
 export const kernelQuizzes: Quiz[] = [
   {
     id: 'k-01',
     category: CATEGORY,
-    question: '3×3の全要素が均等な平均化カーネル（ボックスブラー）を適用した結果はどれ？',
-    sourceImage: 'checker',
+    question: BOX_BLUR_DISPLAY,
+    sourceImage: 'bud',
     choices: [
       {
         label: 'A',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.boxBlur3 },
-        description: 'ボックスブラー（平滑化）',
+        description: '移動平均（平滑化）',
       },
       {
         label: 'B',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
+        description: '鮮鋭化',
       },
       {
         label: 'C',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.laplacian },
-        description: 'ラプラシアン（エッジ検出）',
+        description: 'ラプラシアン',
       },
       {
         label: 'D',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.sobelX },
-        description: 'Sobel X（水平微分）',
+        description: 'Sobel X（垂直エッジ）',
       },
     ],
     answer: 0,
     explanation:
-      'ボックスブラーは近傍9画素の平均値を使って平滑化します。市松模様のような高周波成分がならされてぼやけ、境界が灰色になります。シャープネスは逆に輪郭を強調し、ラプラシアン・Sobelはエッジを検出します。',
+      '全要素が 1/9 の移動平均フィルタは周辺9画素の単純平均を取り、画像を均等にぼかします（平滑化）。高周波成分（細かい模様やエッジ）が除去されてなめらかになります。',
   },
   {
     id: 'k-02',
     category: CATEGORY,
-    question: '中心に重みを置いたガウシアンカーネルを適用した結果はどれ？',
-    sourceImage: 'portrait',
+    question: GAUSSIAN_DISPLAY,
+    sourceImage: 'bud',
     choices: [
       {
         label: 'A',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.sobelY },
-        description: 'Sobel Y（垂直微分）',
+        description: 'Sobel Y（水平エッジ）',
       },
       {
         label: 'B',
         processorFn: 'applyKernel',
-        params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
+        params: { kernel: KERNELS.boxBlur3 },
+        description: '移動平均（平滑化）',
       },
       {
         label: 'C',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.gaussian3 },
-        description: 'ガウシアンぼかし',
+        description: 'ガウシアン平滑化',
       },
       {
         label: 'D',
         processorFn: 'applyKernel',
-        params: { kernel: KERNELS.laplacian },
-        description: 'ラプラシアン（エッジ検出）',
+        params: { kernel: KERNELS.sharpen },
+        description: '鮮鋭化',
       },
     ],
     answer: 2,
     explanation:
-      'ガウシアンカーネルは中心ほど重みが大きく、周辺に向かって重みが小さくなります。ボックスブラーより自然で滑らかなぼかしになり、ノイズ除去に広く使われます。',
+      'ガウシアンカーネルは中心(4)ほど重みが大きく、距離に応じて重みが減ります。移動平均より自然で滑らかなぼかしになり、ノイズ除去に広く使われます。中心重み4・斜め重み1・上下左右重み2 → 合計16で正規化。',
   },
   {
     id: 'k-03',
     category: CATEGORY,
-    question: '中心画素を強調し周囲を引く鮮鋭化カーネルを適用した結果はどれ？',
-    sourceImage: 'portrait',
+    question: SHARPEN_DISPLAY,
+    sourceImage: 'momiji',
     choices: [
       {
         label: 'A',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.gaussian3 },
-        description: 'ガウシアンぼかし',
+        description: 'ガウシアン平滑化',
+      },
+      {
+        label: 'B',
+        processorFn: 'applyKernel',
+        params: { kernel: KERNELS.laplacian },
+        description: 'ラプラシアン',
+      },
+      {
+        label: 'C',
+        processorFn: 'applyKernel',
+        params: { kernel: KERNELS.sharpen },
+        description: '鮮鋭化（上下左右）',
+      },
+      {
+        label: 'D',
+        processorFn: 'applyKernel',
+        params: { kernel: KERNELS.sobelX },
+        description: 'Sobel X',
+      },
+    ],
+    answer: 2,
+    explanation:
+      '中心(5)、上下左右(-1)の鮮鋭化カーネルです。重みの合計は 5-4=1 なので明るさを保ちつつエッジを強調します。「元画像 + ラプラシアン成分」に相当し、輪郭がくっきりします。',
+  },
+  {
+    id: 'k-04',
+    category: CATEGORY,
+    question: SHARPEN8_DISPLAY,
+    sourceImage: 'momiji',
+    choices: [
+      {
+        label: 'A',
+        processorFn: 'applyKernel',
+        params: { kernel: KERNELS.gaussian3 },
+        description: 'ガウシアン平滑化',
       },
       {
         label: 'B',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.boxBlur3 },
-        description: 'ボックスブラー',
+        description: '移動平均',
       },
       {
         label: 'C',
         processorFn: 'applyKernel',
-        params: { kernel: KERNELS.sobelX },
-        description: 'Sobel X',
+        params: { kernel: KERNELS.sharpen },
+        description: '鮮鋭化（上下左右）',
       },
       {
         label: 'D',
         processorFn: 'applyKernel',
-        params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
+        params: { kernel: SHARPEN_ALL },
+        description: '鮮鋭化（8近傍）',
       },
     ],
     answer: 3,
     explanation:
-      '鮮鋭化カーネルは中心の重み(5)で元画素を強め、上下左右(-1)を引くことで局所的な差異を拡大します。重みの合計が1なので明るさは保たれたまま輪郭が際立ちます。',
+      '中心(9)、周囲8方向すべて(-1)の全方向鮮鋭化カーネルです。上下左右のみのカーネル(中心5)よりも強くエッジを強調します。斜め方向のエッジも検出するため、より鮮明になりますが過強調になりやすいです。',
   },
   {
-    id: 'k-04',
+    id: 'k-05',
     category: CATEGORY,
-    question: 'ラプラシアンカーネルを適用した結果はどれ？エッジ部分が浮き出て平坦部は灰色になる。',
+    question: LAPLACIAN_DISPLAY,
     sourceImage: 'geometric',
     choices: [
       {
         label: 'A',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.laplacian },
-        description: 'ラプラシアン（エッジ検出）',
+        description: 'ラプラシアン（全方向エッジ）',
       },
       {
         label: 'B',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.boxBlur3 },
-        description: 'ボックスブラー',
+        description: '移動平均',
       },
       {
         label: 'C',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
+        description: '鮮鋭化',
       },
       {
         label: 'D',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.gaussian3 },
-        description: 'ガウシアンぼかし',
+        description: 'ガウシアン平滑化',
       },
     ],
     answer: 0,
     explanation:
-      'ラプラシアンは2次微分に相当するエッジ検出フィルタです。重みの合計が0のため、輝度変化のない平坦部は0（灰色オフセット+128）となり、エッジ部分だけが明暗として浮き出ます。',
+      '重みの合計が0のラプラシアンカーネルは2次微分フィルタです。輝度変化のない平坦部は0→グレー(128)で表示され、エッジ部分のみが明暗として浮き出ます。全方向のエッジを同時に検出できます。',
   },
   {
-    id: 'k-05',
+    id: 'k-06',
     category: CATEGORY,
-    question: 'Sobel Xカーネルを適用した結果はどれ？左右方向の輝度変化（垂直エッジ）が強調される。',
+    question: SOBEL_X_DISPLAY,
     sourceImage: 'geometric',
     choices: [
       {
         label: 'A',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.gaussian3 },
-        description: 'ガウシアンぼかし',
+        description: 'ガウシアン平滑化',
       },
       {
         label: 'B',
@@ -177,12 +276,12 @@ export const kernelQuizzes: Quiz[] = [
     ],
     answer: 2,
     explanation:
-      'Sobel Xは左右の輝度差を計算する微分フィルタです。縦方向（垂直）のエッジが強く検出されます。Sobel Yは上下方向の差分を取り水平エッジを検出し、ラプラシアンは全方向のエッジを同時に検出します。',
+      'Sobel Xは左列(-1,-2,-1)と右列(+1,+2,+1)の差で左右方向（水平）の輝度変化を計算する1次微分フィルタです。縦方向（垂直）のエッジが強調されます。中央列がゼロで上下方向には応答しません。',
   },
   {
-    id: 'k-06',
+    id: 'k-07',
     category: CATEGORY,
-    question: 'Sobel Yカーネルを適用した結果はどれ？上下方向の輝度変化（水平エッジ）が強調される。',
+    question: SOBEL_Y_DISPLAY,
     sourceImage: 'geometric',
     choices: [
       {
@@ -201,53 +300,18 @@ export const kernelQuizzes: Quiz[] = [
         label: 'C',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
+        description: '鮮鋭化',
       },
       {
         label: 'D',
         processorFn: 'applyKernel',
         params: { kernel: KERNELS.boxBlur3 },
-        description: 'ボックスブラー',
+        description: '移動平均',
       },
     ],
     answer: 1,
     explanation:
-      'Sobel Yは垂直方向（上下）の輝度差を計算します。水平方向（横）のエッジが強く検出されます。Sobel Xと90度直交する向きのエッジを検出するため、縦線と横線で異なるフィルタが応答します。',
-  },
-  {
-    id: 'k-07',
-    category: CATEGORY,
-    question: 'チェッカーボードにガウシアンカーネルを適用した結果はどれ？',
-    sourceImage: 'checker',
-    choices: [
-      {
-        label: 'A',
-        processorFn: 'applyKernel',
-        params: { kernel: KERNELS.sharpen },
-        description: 'シャープネス強調',
-      },
-      {
-        label: 'B',
-        processorFn: 'applyKernel',
-        params: { kernel: KERNELS.laplacian },
-        description: 'ラプラシアン（エッジ検出）',
-      },
-      {
-        label: 'C',
-        processorFn: 'applyKernel',
-        params: { kernel: KERNELS.sobelX },
-        description: 'Sobel X',
-      },
-      {
-        label: 'D',
-        processorFn: 'applyKernel',
-        params: { kernel: KERNELS.gaussian3 },
-        description: 'ガウシアンぼかし',
-      },
-    ],
-    answer: 3,
-    explanation:
-      'ガウシアンカーネルは中心に近い画素ほど重みが大きいため、市松模様の境界が滑らかにぼやけます。ボックスブラーよりも自然な滑らかさになります。シャープネスは逆に境界を強調し、エッジ検出フィルタは境界のみを抽出します。',
+      'Sobel Yは上行(-1,-2,-1)と下行(+1,+2,+1)の差で上下方向（垂直）の輝度変化を計算します。横方向（水平）のエッジが強調されます。Sobel XとYを組み合わせてエッジ強度 √(X²+Y²) を計算することが多いです。',
   },
 ]
 
