@@ -1,19 +1,5 @@
 import { useEffect, useRef } from 'react'
-import {
-  applyToneCurve,
-  applyKernel,
-  applyThreshold,
-  morphology,
-} from '../processors'
-import type { Channel, CurvePoint } from '../processors'
-import {
-  translate,
-  scale,
-  rotate,
-  flipHorizontal,
-  flipVertical,
-} from '../processors/geometric'
-import { generateSourceImage } from '../processors/testImages'
+import { processChoice } from '../processors/processChoice'
 import { allQuizzes } from '../quizzes'
 
 type Props = {
@@ -22,66 +8,8 @@ type Props = {
   height?: number
 }
 
-// 各 processor が期待する params の型
-type ToneCurveParams = { channel: Channel; curvePoints: CurvePoint[] }
-type KernelParams = { kernel: readonly (readonly number[])[] }
-type ThresholdParams = { method: 'otsu' | 'fixed'; value?: number }
-type MorphologyParams = { operation: 'dilate' | 'erode'; kernelSize: number }
-type TranslateParams = { dx: number; dy: number }
-type ScaleParams = { sx: number; sy: number }
-type RotateParams = { angleDeg: number; cx?: number; cy?: number }
-
 /**
- * quizId に対応する画像処理をテスト画像に適用して ImageData を返す。
- * クイズ定義から sourceImage / processorFn / params を引き、処理関数で分岐する。
- */
-function processForQuiz(quizId: string): ImageData {
-  const quiz = allQuizzes.find((q) => q.id === quizId)
-  const source = generateSourceImage(quiz?.sourceImage)
-  if (!quiz) return source
-
-  switch (quiz.processorFn) {
-    case 'applyToneCurve': {
-      const p = quiz.params as ToneCurveParams
-      return applyToneCurve(source, p.channel, p.curvePoints)
-    }
-    case 'applyKernel': {
-      const p = quiz.params as KernelParams
-      return applyKernel(source, p.kernel)
-    }
-    case 'applyThreshold': {
-      const p = quiz.params as ThresholdParams
-      return applyThreshold(source, p.method, p.value)
-    }
-    case 'morphology': {
-      const p = quiz.params as MorphologyParams
-      // 形態学処理は二値画像が前提なので、まず大津法で二値化してから適用する
-      const binary = applyThreshold(source, 'otsu')
-      return morphology(binary, p.operation, p.kernelSize)
-    }
-    case 'translate': {
-      const p = quiz.params as TranslateParams
-      return translate(source, p.dx, p.dy)
-    }
-    case 'scale': {
-      const p = quiz.params as ScaleParams
-      return scale(source, p.sx, p.sy)
-    }
-    case 'rotate': {
-      const p = quiz.params as RotateParams
-      return rotate(source, p.angleDeg, p.cx, p.cy)
-    }
-    case 'flipHorizontal':
-      return flipHorizontal(source)
-    case 'flipVertical':
-      return flipVertical(source)
-    default:
-      return source
-  }
-}
-
-/**
- * テスト画像に quizId の処理を適用して表示するコンポーネント。
+ * テスト画像にクイズの正解choiceの処理を適用して表示するコンポーネント。
  */
 export default function ProcessedImageCanvas({
   quizId,
@@ -96,9 +24,12 @@ export default function ProcessedImageCanvas({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const processed = processForQuiz(quizId)
+    const quiz = allQuizzes.find((q) => q.id === quizId)
+    if (!quiz) return
 
-    // 生成画像（200×200）を canvas サイズに合わせて描画
+    const choice = quiz.choices[quiz.answer]
+    const processed = processChoice(quiz.sourceImage, choice)
+
     const off = document.createElement('canvas')
     off.width = processed.width
     off.height = processed.height

@@ -41,7 +41,19 @@ export default function App() {
   }
 
   if (screen === 'quiz') {
-    return <QuizSession key={selectedCategory} quizzes={activeQuizzes} onFinish={handleFinish} />
+    return (
+      <>
+        <header style={{ padding: '0.75rem 1.5rem', borderBottom: '1px solid #e5e7eb', marginBottom: '1rem' }}>
+          <button
+            onClick={() => setScreen('start')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold', color: '#1d4ed8' }}
+          >
+            画像処理クイズ
+          </button>
+        </header>
+        <QuizSession key={selectedCategory} quizzes={activeQuizzes} onFinish={handleFinish} />
+      </>
+    )
   }
 
   if (screen === 'result' && result) {

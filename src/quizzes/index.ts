@@ -1,10 +1,10 @@
-import type { Quiz } from './toneCurve'
+import type { Quiz } from './types'
 import toneCurveQuizzes from './toneCurve'
 import kernelQuizzes from './kernel'
 import thresholdQuizzes from './threshold'
 import geometricQuizzes from './geometric'
 
-export type { Quiz } from './toneCurve'
+export type { Quiz, QuizChoice } from './types'
 
 export { default as toneCurveQuizzes } from './toneCurve'
 export { default as kernelQuizzes } from './kernel'
