@@ -75,7 +75,7 @@ export default function QuizCard({ quiz, onAnswer }: Props) {
         {quiz.outputDisplay && (
           <figure style={{ margin: 0, textAlign: 'center' }}>
             <figcaption style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '4px' }}>処理後</figcaption>
-            <div style={{ filter: answered ? 'none' : 'blur(12px)', transition: 'filter 0.4s', borderRadius: '4px', overflow: 'hidden', display: 'inline-block' }}>
+            <div style={{ borderRadius: '4px', overflow: 'hidden', display: 'inline-block' }}>
               <OutputDisplayCanvas sourceImage={quiz.sourceImage} outputDisplay={quiz.outputDisplay} width={200} height={200} />
             </div>
           </figure>

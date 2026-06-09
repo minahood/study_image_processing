@@ -53,7 +53,28 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
     const bg = state === 'correct' ? '#dcfce7'
       : state === 'wrong' ? '#fee2e2'
       : state === 'selected' ? '#eff6ff'
-      : '#f9fafb'
+      : '#fff'
+
+    // Parse "value [×scale]" lines into rows of cells + optional scale annotation
+    // Format: each line is "v1  v2  v3" optionally with "×1/9" suffix on one line
+    const lines = choice.kernelMatrix.trim().split('\n')
+    let scale = ''
+    const rows = lines.map((line) => {
+      const scaleMatch = line.match(/×\S+/)
+      if (scaleMatch) scale = scaleMatch[0]
+      const cells = line.replace(/×\S+/, '').trim().split(/\s+/)
+      return cells
+    })
+
+    const cellStyle: React.CSSProperties = {
+      border: '1px solid #374151',
+      padding: '4px 6px',
+      textAlign: 'center',
+      fontSize: '0.75rem',
+      fontFamily: 'monospace',
+      minWidth: '28px',
+      color: '#1f2937',
+    }
 
     return (
       <div
@@ -73,19 +94,25 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
           background: bg,
           padding: '8px',
           boxSizing: 'border-box',
+          gap: '4px',
         }}
       >
-        <pre style={{
-          fontSize: '0.65rem',
-          lineHeight: 1.5,
-          margin: 0,
-          fontFamily: 'monospace',
-          whiteSpace: 'pre',
-          color: '#1f2937',
-          textAlign: 'center',
-        }}>
-          {choice.kernelMatrix}
-        </pre>
+        <table style={{ borderCollapse: 'collapse' }}>
+          <tbody>
+            {rows.map((cells, ri) => (
+              <tr key={ri}>
+                {cells.map((cell, ci) => (
+                  <td key={ci} style={cellStyle}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {scale && (
+          <div style={{ fontSize: '0.7rem', fontFamily: 'monospace', color: '#374151' }}>
+            {scale}
+          </div>
+        )}
         <div style={{
           position: 'absolute',
           top: 4,
