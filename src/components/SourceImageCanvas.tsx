@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { generateSourceImage } from '../processors/testImages'
+import { loadImage, isRealImage, realImagePath } from '../processors/imageLoader'
 import { allQuizzes } from '../quizzes'
 
 type Props = {
@@ -31,20 +32,31 @@ export default function SourceImageCanvas({
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
+    const ctx = canvas.getContext('2d')!
     const type = resolveSourceImage(quizId, sourceImage)
-    const img = generateSourceImage(type)
 
-    // 生成画像（200×200）を canvas サイズに合わせて描画
-    const off = document.createElement('canvas')
-    off.width = img.width
-    off.height = img.height
-    off.getContext('2d')!.putImageData(img, 0, 0)
+    if (isRealImage(type)) {
+      // Show loading state
+      ctx.fillStyle = '#e5e7eb'
+      ctx.fillRect(0, 0, width, height)
+      ctx.fillStyle = '#6b7280'
+      ctx.font = '14px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('Loading...', width / 2, height / 2)
 
-    ctx.clearRect(0, 0, width, height)
-    ctx.drawImage(off, 0, 0, width, height)
+      loadImage(realImagePath(type), width, height).then((img) => {
+        if (canvasRef.current !== canvas) return // unmounted
+        ctx.putImageData(img, 0, 0)
+      })
+    } else {
+      const img = generateSourceImage(type)
+      const off = document.createElement('canvas')
+      off.width = img.width
+      off.height = img.height
+      off.getContext('2d')!.putImageData(img, 0, 0)
+      ctx.clearRect(0, 0, width, height)
+      ctx.drawImage(off, 0, 0, width, height)
+    }
   }, [quizId, sourceImage, width, height])
 
   return <canvas ref={canvasRef} width={width} height={height} />

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { processChoice } from '../processors/processChoice'
+import { processChoiceAsync } from '../processors/processChoice'
 import type { QuizChoice } from '../quizzes'
 
 type State = 'idle' | 'selected' | 'correct' | 'wrong'
@@ -20,13 +20,26 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const processed = processChoice(sourceImage, choice)
-    const off = document.createElement('canvas')
-    off.width = processed.width
-    off.height = processed.height
-    off.getContext('2d')!.putImageData(processed, 0, 0)
-    ctx.clearRect(0, 0, 150, 150)
-    ctx.drawImage(off, 0, 0, 150, 150)
+
+    // Show loading
+    ctx.fillStyle = '#e5e7eb'
+    ctx.fillRect(0, 0, 150, 150)
+    ctx.fillStyle = '#6b7280'
+    ctx.font = '12px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('Loading...', 75, 75)
+
+    let cancelled = false
+    processChoiceAsync(sourceImage, choice).then((processed) => {
+      if (cancelled) return
+      const off = document.createElement('canvas')
+      off.width = processed.width
+      off.height = processed.height
+      off.getContext('2d')!.putImageData(processed, 0, 0)
+      ctx.clearRect(0, 0, 150, 150)
+      ctx.drawImage(off, 0, 0, 150, 150)
+    })
+    return () => { cancelled = true }
   }, [choice, sourceImage])
 
   const borderColor = state === 'correct' ? '#16a34a'
