@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes } from './quizzes'
+import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometricQuizzes } from './quizzes'
 import type { Quiz } from './quizzes'
 import QuizSession from './components/QuizSession'
 import ResultScreen from './components/ResultScreen'
@@ -13,10 +13,11 @@ type Category = {
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'all',        label: 'すべて（全13問）',       quizzes: allQuizzes },
-  { id: 'toneCurve',  label: 'トーンカーブ（5問）',     quizzes: toneCurveQuizzes },
-  { id: 'kernel',     label: 'カーネルフィルタ（5問）', quizzes: kernelQuizzes },
-  { id: 'threshold',  label: '二値化・形態学（3問）',   quizzes: thresholdQuizzes },
+  { id: 'all',        label: 'すべて（全20問）',         quizzes: allQuizzes },
+  { id: 'toneCurve',  label: 'トーンカーブ（5問）',       quizzes: toneCurveQuizzes },
+  { id: 'kernel',     label: 'カーネルフィルタ（7問）',   quizzes: kernelQuizzes },
+  { id: 'threshold',  label: '二値化・形態学（3問）',     quizzes: thresholdQuizzes },
+  { id: 'geometric',  label: '幾何学変換（5問）',         quizzes: geometricQuizzes },
 ]
 
 export default function App() {

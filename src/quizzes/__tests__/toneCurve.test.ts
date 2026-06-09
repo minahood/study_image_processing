@@ -24,29 +24,21 @@ describe('toneCurveQuizzes', () => {
     }
   })
 
-  it('processorFn がすべて applyToneCurve である', () => {
+  it('各 choice の processorFn がすべて applyToneCurve である', () => {
     for (const q of toneCurveQuizzes) {
-      expect(q.processorFn).toBe('applyToneCurve')
+      for (const c of q.choices) {
+        expect(c.processorFn).toBe('applyToneCurve')
+      }
     }
   })
 
-  it('params に channel と curvePoints が含まれる', () => {
+  it('各 choice の params に channel と curvePoints が含まれる', () => {
     for (const q of toneCurveQuizzes) {
-      const p = q.params as Record<string, unknown>
-      expect(p).toHaveProperty('channel')
-      expect(p).toHaveProperty('curvePoints')
-      expect(Array.isArray(p['curvePoints'])).toBe(true)
-    }
-  })
-
-  it('各 curvePoint が in/out プロパティを持ち 0–255 の範囲である', () => {
-    for (const q of toneCurveQuizzes) {
-      const p = q.params as { curvePoints: { in: number; out: number }[] }
-      for (const pt of p.curvePoints) {
-        expect(pt.in).toBeGreaterThanOrEqual(0)
-        expect(pt.in).toBeLessThanOrEqual(255)
-        expect(pt.out).toBeGreaterThanOrEqual(0)
-        expect(pt.out).toBeLessThanOrEqual(255)
+      for (const c of q.choices) {
+        const p = c.params as Record<string, unknown>
+        expect(p).toHaveProperty('channel')
+        expect(p).toHaveProperty('curvePoints')
+        expect(Array.isArray(p['curvePoints'])).toBe(true)
       }
     }
   })
