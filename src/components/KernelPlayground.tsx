@@ -1,7 +1,47 @@
 import { useState, useEffect, useRef } from 'react'
 import { loadImage, isRealImage, realImagePath } from '../processors/imageLoader'
 import { generateSourceImage } from '../processors/testImages'
-import { applyKernel } from '../processors'
+
+// Apply kernel with explicit scale divisor (bypasses applyKernel's auto-normalization)
+function applyKernelWithScale(imageData: ImageData, kernel: number[][], scale: number): ImageData {
+  const { width, height, data: src } = imageData
+  const out = new Uint8ClampedArray(src.length)
+  const kH = kernel.length
+  const kW = kernel[0].length
+  const halfH = Math.floor(kH / 2)
+  const halfW = Math.floor(kW / 2)
+  const kSum = kernel.flat().reduce((a, b) => a + b, 0)
+  const divisor = scale !== 1 ? 1 / scale : (kSum !== 0 ? kSum : null)
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let r = 0, g = 0, b = 0
+      for (let ky = 0; ky < kH; ky++) {
+        for (let kx = 0; kx < kW; kx++) {
+          const sy = Math.min(height - 1, Math.max(0, y + ky - halfH))
+          const sx = Math.min(width - 1, Math.max(0, x + kx - halfW))
+          const idx = (sy * width + sx) * 4
+          const w = kernel[ky][kx]
+          r += src[idx]     * w
+          g += src[idx + 1] * w
+          b += src[idx + 2] * w
+        }
+      }
+      const di = (y * width + x) * 4
+      if (divisor !== null) {
+        out[di]     = Math.max(0, Math.min(255, Math.round(r * divisor)))
+        out[di + 1] = Math.max(0, Math.min(255, Math.round(g * divisor)))
+        out[di + 2] = Math.max(0, Math.min(255, Math.round(b * divisor)))
+      } else {
+        out[di]     = Math.max(0, Math.min(255, Math.abs(Math.round(r)) + 128))
+        out[di + 1] = Math.max(0, Math.min(255, Math.abs(Math.round(g)) + 128))
+        out[di + 2] = Math.max(0, Math.min(255, Math.abs(Math.round(b)) + 128))
+      }
+      out[di + 3] = src[(y * width + x) * 4 + 3]
+    }
+  }
+  return new ImageData(out, width, height)
+}
 
 // Source image options
 const IMAGE_OPTIONS = [
@@ -72,8 +112,7 @@ export default function KernelPlayground({ onBack }: Props) {
     if (!sourceData || !resultCanvasRef.current) return
     const ctx = resultCanvasRef.current.getContext('2d')!
     // Apply scale multiplier to each kernel element
-    const scaledKernel = kernel.map(row => row.map(v => v * scale)) as readonly (readonly number[])[]
-    const result = applyKernel(sourceData, scaledKernel)
+    const result = applyKernelWithScale(sourceData, kernel, scale)
     const off = document.createElement('canvas')
     off.width = result.width
     off.height = result.height
