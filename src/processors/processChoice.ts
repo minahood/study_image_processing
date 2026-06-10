@@ -1,5 +1,5 @@
 import { applyToneCurve, applyKernel, applyThreshold, morphology } from './index'
-import { translate, scale, rotate, flipHorizontal, flipVertical } from './geometric'
+import { translate, scale, rotate, flipHorizontal, flipVertical, scaleTranslate } from './geometric'
 import { generateSourceImage } from './testImages'
 import { loadImage, isRealImage, realImagePath } from './imageLoader'
 import type { QuizChoice } from '../quizzes'
@@ -19,6 +19,7 @@ function applyChoice(source: ImageData, choice: QuizChoice): ImageData {
     case 'rotate': return rotate(source, p.angleDeg, p.cx, p.cy)
     case 'flipHorizontal': return flipHorizontal(source)
     case 'flipVertical': return flipVertical(source)
+    case 'scaleTranslate': return scaleTranslate(source, p.sx, p.sy, p.tx, p.ty)
     default: return source
   }
 }

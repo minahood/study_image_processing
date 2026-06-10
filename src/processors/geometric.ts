@@ -108,6 +108,31 @@ export function flipHorizontal(imageData: ImageData): ImageData {
   return new ImageData(out, width, height)
 }
 
+/**
+ * 拡大縮小 + 平行移動の複合変換（左上原点）。
+ * x' = sx*x + tx, y' = sy*y + ty
+ */
+export function scaleTranslate(
+  imageData: ImageData,
+  sx: number,
+  sy: number,
+  tx: number,
+  ty: number,
+): ImageData {
+  const { data: src, width, height } = imageData
+  const out = blackCanvas(width, height)
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const srcX = Math.floor((x - tx) / sx)
+      const srcY = Math.floor((y - ty) / sy)
+      copyPixel(src, out, width, height, srcX, srcY, x, y)
+    }
+  }
+
+  return new ImageData(out, width, height)
+}
+
 /** 垂直反転（上下反転） */
 export function flipVertical(imageData: ImageData): ImageData {
   const { data: src, width, height } = imageData

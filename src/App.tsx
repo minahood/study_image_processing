@@ -14,11 +14,11 @@ type Category = {
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'all',           label: 'すべて（全39問）',                quizzes: allQuizzes },
+  { id: 'all',           label: 'すべて（全42問）',                quizzes: allQuizzes },
   { id: 'toneCurve',     label: 'トーンカーブ（5問）',              quizzes: toneCurveQuizzes },
   { id: 'kernel',        label: 'カーネルフィルタ（7問）',          quizzes: kernelQuizzes },
   { id: 'threshold',     label: '二値化・形態学（3問）',            quizzes: thresholdQuizzes },
-  { id: 'geometric',     label: '幾何学変換（5問）',                quizzes: geometricQuizzes },
+  { id: 'geometric',     label: '幾何学変換（8問）',                quizzes: geometricQuizzes },
   { id: 'realImage',     label: 'フリー画像クイズ（12問）',         quizzes: realImageQuizzes },
   { id: 'kernelReverse', label: 'カーネル逆問題（7問）',            quizzes: kernelReverseQuizzes },
 ]
