@@ -15,15 +15,15 @@ const IMAGE_OPTIONS = [
 ]
 
 // Preset kernels
-const PRESETS: { label: string; kernel: number[][]; scale?: string }[] = [
-  { label: '移動平均',     kernel: [[1,1,1],[1,1,1],[1,1,1]], scale: '1/9' },
-  { label: 'ガウシアン',   kernel: [[1,2,1],[2,4,2],[1,2,1]], scale: '1/16' },
-  { label: '鮮鋭化',       kernel: [[0,-1,0],[-1,5,-1],[0,-1,0]] },
-  { label: '全方向鮮鋭化', kernel: [[-1,-1,-1],[-1,9,-1],[-1,-1,-1]] },
-  { label: 'ラプラシアン', kernel: [[0,1,0],[1,-4,1],[0,1,0]] },
-  { label: 'Sobel X',      kernel: [[-1,0,1],[-2,0,2],[-1,0,1]] },
-  { label: 'Sobel Y',      kernel: [[-1,-2,-1],[0,0,0],[1,2,1]] },
-  { label: '恒等変換',     kernel: [[0,0,0],[0,1,0],[0,0,0]] },
+const PRESETS: { label: string; kernel: number[][]; scale: number }[] = [
+  { label: '移動平均',     kernel: [[1,1,1],[1,1,1],[1,1,1]], scale: 1/9 },
+  { label: 'ガウシアン',   kernel: [[1,2,1],[2,4,2],[1,2,1]], scale: 1/16 },
+  { label: '鮮鋭化',       kernel: [[0,-1,0],[-1,5,-1],[0,-1,0]], scale: 1 },
+  { label: '全方向鮮鋭化', kernel: [[-1,-1,-1],[-1,9,-1],[-1,-1,-1]], scale: 1 },
+  { label: 'ラプラシアン', kernel: [[0,1,0],[1,-4,1],[0,1,0]], scale: 1 },
+  { label: 'Sobel X',      kernel: [[-1,0,1],[-2,0,2],[-1,0,1]], scale: 1 },
+  { label: 'Sobel Y',      kernel: [[-1,-2,-1],[0,0,0],[1,2,1]], scale: 1 },
+  { label: '恒等変換',     kernel: [[0,0,0],[0,1,0],[0,0,0]], scale: 1 },
 ]
 
 type Props = { onBack: () => void }
@@ -31,6 +31,8 @@ type Props = { onBack: () => void }
 export default function KernelPlayground({ onBack }: Props) {
   const [selectedImage, setSelectedImage] = useState('momiji')
   const [kernel, setKernel] = useState<number[][]>([[0,0,0],[0,1,0],[0,0,0]])
+  const [scale, setScale] = useState(1)
+  const [scaleInput, setScaleInput] = useState('1')
   const [sourceData, setSourceData] = useState<ImageData | null>(null)
   const sourceCanvasRef = useRef<HTMLCanvasElement>(null)
   const resultCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -69,16 +71,16 @@ export default function KernelPlayground({ onBack }: Props) {
   useEffect(() => {
     if (!sourceData || !resultCanvasRef.current) return
     const ctx = resultCanvasRef.current.getContext('2d')!
-    // Convert kernel to readonly format for applyKernel
-    const readonlyKernel = kernel.map(row => [...row]) as readonly (readonly number[])[]
-    const result = applyKernel(sourceData, readonlyKernel)
+    // Apply scale multiplier to each kernel element
+    const scaledKernel = kernel.map(row => row.map(v => v * scale)) as readonly (readonly number[])[]
+    const result = applyKernel(sourceData, scaledKernel)
     const off = document.createElement('canvas')
     off.width = result.width
     off.height = result.height
     off.getContext('2d')!.putImageData(result, 0, 0)
     ctx.clearRect(0, 0, SIZE, SIZE)
     ctx.drawImage(off, 0, 0, SIZE, SIZE)
-  }, [sourceData, kernel])
+  }, [sourceData, kernel, scale])
 
   function updateCell(row: number, col: number, value: string) {
     const num = parseFloat(value)
@@ -90,6 +92,21 @@ export default function KernelPlayground({ onBack }: Props) {
 
   function applyPreset(preset: typeof PRESETS[0]) {
     setKernel(preset.kernel.map(r => [...r]))
+    setScale(preset.scale)
+    setScaleInput(
+      preset.scale === 1/9  ? '1/9'  :
+      preset.scale === 1/16 ? '1/16' :
+      String(preset.scale)
+    )
+  }
+
+  function handleScaleInput(value: string) {
+    setScaleInput(value)
+    // Support fractions like "1/9", "1/16"
+    const num = value.includes('/')
+      ? parseFloat(value.split('/')[0]) / parseFloat(value.split('/')[1])
+      : parseFloat(value)
+    if (!isNaN(num) && num !== 0) setScale(num)
   }
 
   // Compute kernel sum for display
@@ -179,11 +196,34 @@ export default function KernelPlayground({ onBack }: Props) {
               ))}
             </tbody>
           </table>
-          <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '1rem' }}>
+          <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.75rem' }}>
             合計: {kernelSum.toFixed(3)}
             {Math.abs(kernelSum) < 0.001 && (
               <span style={{ marginLeft: '0.5rem', color: '#d97706' }}>（合計0 → 平坦部がグレーに）</span>
             )}
+          </div>
+
+          {/* Scale input */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#374151' }}>倍率</span>
+            <span style={{ fontSize: '1rem', color: '#6b7280' }}>×</span>
+            <input
+              type="text"
+              value={scaleInput}
+              onChange={e => handleScaleInput(e.target.value)}
+              style={{
+                width: '64px',
+                height: '36px',
+                textAlign: 'center',
+                border: '1px solid #9ca3af',
+                borderRadius: '4px',
+                fontSize: '0.95rem',
+                fontFamily: 'monospace',
+                padding: '0 4px',
+              }}
+              placeholder="1/9"
+            />
+            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>（分数可: 1/9）</span>
           </div>
 
           {/* Presets */}
