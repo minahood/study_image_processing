@@ -9,7 +9,7 @@ export const toneCurveQuizzes: Quiz[] = [
     id: 'tc-01',
     category: CATEGORY,
     question: '元画像のRチャンネルのみを全体的に明るくした結果はどれ？',
-    sourceImage: 'portrait',
+    sourceImage: 'momiji',
     choices: [
       {
         label: 'A',
@@ -44,7 +44,7 @@ export const toneCurveQuizzes: Quiz[] = [
     id: 'tc-02',
     category: CATEGORY,
     question: '全チャンネルにネガポジ反転（入力0→出力255、入力255→出力0）を適用した結果はどれ？',
-    sourceImage: 'portrait',
+    sourceImage: 'momiji',
     choices: [
       {
         label: 'A',

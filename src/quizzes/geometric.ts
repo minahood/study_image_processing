@@ -42,7 +42,7 @@ const geometricQuizzes: Quiz[] = [
     id: 'g-02',
     category: CATEGORY,
     question: 'x方向のみ 2倍 拡大（scale sx=2, sy=1）した結果はどれ？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',
@@ -77,7 +77,7 @@ const geometricQuizzes: Quiz[] = [
     id: 'g-03',
     category: CATEGORY,
     question: '画像を中心まわりに 90度 回転（rotate angleDeg=90）した結果はどれ？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',
@@ -147,7 +147,7 @@ const geometricQuizzes: Quiz[] = [
     id: 'g-05',
     category: CATEGORY,
     question: '画像を 0.5倍 に縮小（scale sx=0.5, sy=0.5）した結果はどれ？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',

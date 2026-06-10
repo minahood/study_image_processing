@@ -212,7 +212,7 @@ export const kernelQuizzes: Quiz[] = [
     id: 'k-05',
     category: CATEGORY,
     question: LAPLACIAN_DISPLAY,
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',
@@ -247,7 +247,7 @@ export const kernelQuizzes: Quiz[] = [
     id: 'k-06',
     category: CATEGORY,
     question: SOBEL_X_DISPLAY,
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',
@@ -282,7 +282,7 @@ export const kernelQuizzes: Quiz[] = [
     id: 'k-07',
     category: CATEGORY,
     question: SOBEL_Y_DISPLAY,
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',

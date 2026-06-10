@@ -92,7 +92,7 @@ export const kernelReverseQuizzes: Quiz[] = [
     id: 'k-r-05',
     category: CATEGORY,
     question: 'この処理結果を得るために適用されたカーネルはどれか？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     outputDisplay: { processorFn: 'applyKernel', params: { kernel: KERNELS.laplacian } },
     choices: [
       { label: 'A', processorFn: 'applyKernel', params: { kernel: KERNELS.sobelX }, kernelMatrix: KM.sobelX, description: 'Sobel X' },
@@ -107,7 +107,7 @@ export const kernelReverseQuizzes: Quiz[] = [
     id: 'k-r-06',
     category: CATEGORY,
     question: 'この処理結果を得るために適用されたカーネルはどれか？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     outputDisplay: { processorFn: 'applyKernel', params: { kernel: KERNELS.sobelX } },
     choices: [
       { label: 'A', processorFn: 'applyKernel', params: { kernel: KERNELS.laplacian }, kernelMatrix: KM.laplacian, description: 'ラプラシアン' },
@@ -122,7 +122,7 @@ export const kernelReverseQuizzes: Quiz[] = [
     id: 'k-r-07',
     category: CATEGORY,
     question: 'この処理結果を得るために適用されたカーネルはどれか？',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     outputDisplay: { processorFn: 'applyKernel', params: { kernel: KERNELS.sobelY } },
     choices: [
       { label: 'A', processorFn: 'applyKernel', params: { kernel: KERNELS.sobelY }, kernelMatrix: KM.sobelY, description: 'Sobel Y' },

@@ -7,7 +7,7 @@ export const thresholdQuizzes: Quiz[] = [
     id: 't-01',
     category: CATEGORY,
     question: '大津法（Otsu）で自動的に閾値を決めて二値化した結果はどれ？画像の輝度分布を分析して最適な閾値を選ぶ手法。',
-    sourceImage: 'portrait',
+    sourceImage: 'momiji',
     choices: [
       {
         label: 'A',
@@ -77,7 +77,7 @@ export const thresholdQuizzes: Quiz[] = [
     id: 't-03',
     category: CATEGORY,
     question: '二値化後に膨張（dilate）処理を適用した結果はどれ？白い領域が外側に広がる。',
-    sourceImage: 'geometric',
+    sourceImage: 'shapes',
     choices: [
       {
         label: 'A',

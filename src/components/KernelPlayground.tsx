@@ -5,13 +5,13 @@ import { applyKernel } from '../processors'
 
 // Source image options
 const IMAGE_OPTIONS = [
-  { value: 'momiji', label: '紅葉（momiji）' },
-  { value: 'bud',    label: '芽（bud）' },
-  { value: 'summer', label: 'サマービーチ（summer）' },
-  { value: 'geometric', label: '幾何学（生成）' },
-  { value: 'portrait',  label: 'ポートレート（生成）' },
-  { value: 'checker',   label: 'チェッカー（生成）' },
-  { value: 'gradient',  label: 'グラデーション（生成）' },
+  { value: 'momiji',        label: '紅葉（momiji）' },
+  { value: 'bud',           label: '芽（bud）' },
+  { value: 'summer',        label: 'サマービーチ（summer）' },
+  { value: 'shapes',        label: '図形（shapes）' },
+  { value: 'blue_kikagaku', label: '幾何学模様（blue_kikagaku）' },
+  { value: 'checker',       label: 'チェッカー（生成）' },
+  { value: 'gradient',      label: 'グラデーション（生成）' },
 ]
 
 // Preset kernels
