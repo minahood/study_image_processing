@@ -41,7 +41,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.laplacian }, kernelMatrix: KM.laplacian, description: 'ラプラシアン' },
     ],
     answer: 0,
-    explanation: '移動平均フィルタ（ボックスブラー）は全要素が1/9の均等な重みで画像を平滑化します。ガウシアンより均一なぼけ方になり、輪郭がはっきり失われます。',
+    explanation: '出力は元の絵柄が残ったまま全体が均一にぼけているので平滑化カーネルです。全要素1/9の移動平均（A）はガウシアン（B）より均一なぼけ方になります。鮮鋭化（C）は逆に輪郭が際立つので不適、ラプラシアン（D）は重み合計0でグレー地にエッジ線だけが残り元画像が消えるため、ぼけた出力にはなりません。',
   },
   {
     id: 'k-r-02',
@@ -56,7 +56,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.gaussian3 }, kernelMatrix: KM.gaussian3, description: 'ガウシアン' },
     ],
     answer: 3,
-    explanation: 'ガウシアンカーネルは中心(4)に重みを集中させた重み付き平均です。移動平均より自然な滑らかさになります。中心から離れるほど重みが小さくなる点が特徴です。',
+    explanation: '出力は自然に滑らかにぼけているので重み付き平均のガウシアン（D）です。移動平均（B）も平滑化ですが均一すぎるぼけ方になり、中心ほど重みが大きいガウシアンの方が自然です。鮮鋭化（A）は逆に輪郭を強調、Sobel X（C）は縦エッジだけをグレー地に出すエッジ抽出なので、ぼけた出力には一致しません。',
   },
   {
     id: 'k-r-03',
@@ -71,7 +71,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.boxBlur3 }, kernelMatrix: KM.boxBlur3, description: '移動平均' },
     ],
     answer: 1,
-    explanation: '上下左右(-1)・中心(5)の鮮鋭化カーネルです。重みの合計が1なので全体の明るさは変わらず、輪郭だけが強調されます。ラプラシアン(重み合計0)とは異なり階調が保たれます。',
+    explanation: '出力は元の絵柄が残ったまま輪郭がくっきりしているので鮮鋭化（B、中心5・上下左右−1）です。重み合計1で明るさが保たれます。ガウシアン（A）と移動平均（D）は逆にぼけるため不適、ラプラシアン（C）は重み合計0でグレー地にエッジ線だけが残り元画像が消えるため、絵柄が残って輪郭が立つ出力には一致しません。',
   },
   {
     id: 'k-r-04',
@@ -86,7 +86,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.gaussian3 }, kernelMatrix: KM.gaussian3, description: 'ガウシアン' },
     ],
     answer: 1,
-    explanation: '周囲8画素すべて(-1)・中心(9)の全方向鮮鋭化カーネルです。4近傍(中心5)より強いエッジ強調になります。斜め方向の変化も捉えるためより鮮明になります。',
+    explanation: '出力は輪郭が非常に強く立ち斜め方向のエッジも際立っているので8近傍の全方向鮮鋭化（B、中心9）です。4近傍の鮮鋭化（A、中心5）でも輪郭は立ちますが斜め方向への効きが弱く強調も穏やかです。ガウシアン（D）は逆にぼけるため不適、ラプラシアン（C）はグレー地にエッジ線だけが残り元画像が消えるため、絵柄が残って強く鮮鋭化された出力とは異なります。',
   },
   {
     id: 'k-r-05',
@@ -101,7 +101,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.sharpen }, kernelMatrix: KM.sharpen, description: '鮮鋭化' },
     ],
     answer: 2,
-    explanation: 'ラプラシアンは2次微分フィルタで重みの合計が0です。平坦部はグレー(128)、エッジ部分のみが明暗として現れます。全方向のエッジを同時に検出できる点がSobelと異なります。',
+    explanation: '出力はグレー地に全方向のエッジ線だけが浮かんでいるので重み合計0のラプラシアン（C）です。Sobel X（A）は縦エッジだけと方向に偏りがあり全方向均等のラプラシアンとは異なります。鮮鋭化（D）は元画像を残して輪郭を強めるだけ、ガウシアン（B）は元画像をぼかすだけなので、いずれも元の絵柄が消えてグレー地に線が出る出力には一致しません。',
   },
   {
     id: 'k-r-06',
@@ -116,7 +116,7 @@ export const kernelReverseQuizzes: Quiz[] = [
       { label: 'D', processorFn: 'applyKernel', params: { kernel: KERNELS.sobelX }, kernelMatrix: KM.sobelX, description: 'Sobel X' },
     ],
     answer: 3,
-    explanation: 'Sobel Xは左右の輝度差を求める1次微分フィルタです。縦方向（垂直）のエッジが強調されます。左列(-1,-2,-1)と右列(+1,+2,+1)が対称で中央列はすべて0です。',
+    explanation: '出力はグレー地に縦方向のエッジだけが現れているので左右差を取るSobel X（D）です。左列(-1,-2,-1)と右列(+1,+2,+1)が対称で中央列は0です。Sobel Y（B）は横エッジだけが出て向きが直交、ラプラシアン（A）は全方向のエッジが出て偏りがありません。ガウシアン（C）はぼかすだけでエッジ線が出ないため不適です。',
   },
   {
     id: 'k-r-07',

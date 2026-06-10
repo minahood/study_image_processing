@@ -49,8 +49,8 @@ export const toneCurveQuizzes: Quiz[] = [
       {
         label: 'A',
         processorFn: 'applyToneCurve',
-        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 0 }, { in: 255, out: 255 }] },
-        description: '変化なし（恒等変換）',
+        params: { channel: 'g', curvePoints: [{ in: 0, out: 255 }, { in: 255, out: 0 }] },
+        description: 'Gチャンネルのみ反転',
       },
       {
         label: 'B',
@@ -67,13 +67,13 @@ export const toneCurveQuizzes: Quiz[] = [
       {
         label: 'D',
         processorFn: 'applyToneCurve',
-        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 128 }, { in: 255, out: 128 }] },
-        description: '全チャンネルを中間グレーに',
+        params: { channel: 'b', curvePoints: [{ in: 0, out: 255 }, { in: 255, out: 0 }] },
+        description: 'Bチャンネルのみ反転',
       },
     ],
     answer: 1,
     explanation:
-      '入出力を完全に反転させると輝度の明暗が逆転します（ネガポジ反転）。全チャンネルに同じカーブを適用しているため色相は保たれたまま明暗が反転します。Rチャンネルのみ反転だと画像がシアンがかって見えます。',
+      '全チャンネルに同じ反転カーブを適用すると、色相は保たれたまま明暗だけが逆転したネガ画像になります。Rのみ反転（C）は赤の強い紅葉がシアン寄りに、Gのみ反転（A）はマゼンタ寄りに、Bのみ反転（D）は黄色寄りに転び、いずれも特定方向に色が偏ります。全チャンネル反転だけが色の偏りなく明暗が反転する点で区別できます。',
   },
   {
     id: 'tc-03',
@@ -84,8 +84,8 @@ export const toneCurveQuizzes: Quiz[] = [
       {
         label: 'A',
         processorFn: 'applyToneCurve',
-        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 0 }, { in: 255, out: 255 }] },
-        description: '変化なし',
+        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 96 }, { in: 255, out: 160 }] },
+        description: '低コントラスト化',
       },
       {
         label: 'B',
@@ -108,7 +108,7 @@ export const toneCurveQuizzes: Quiz[] = [
     ],
     answer: 2,
     explanation:
-      '出力値が常に128の水平カーブは、入力値によらず全ピクセルを同じ値(128)に変換します。R・G・B すべてが 128 になるため、画像全体が一様な中間グレー(#808080)になります。',
+      '出力値が常に128の水平カーブは入力によらず全画素を128に変換するため、階調が完全に失われ画像全体が一様な中間グレー(#808080)になります。低コントラスト化（A）は出力を96〜160の狭い範囲に圧縮しますが階調は残るためグラデーションが薄く見え、中間調を暗くするカーブ（B）は両端を残し中央だけ沈むため階調が残ります。反転（D）は明暗が逆転したネガで、いずれも階調が残る点で「全画素が同一値になる」均一グレーと区別できます。',
   },
   {
     id: 'tc-04',
@@ -148,7 +148,7 @@ export const toneCurveQuizzes: Quiz[] = [
   {
     id: 'tc-05',
     category: CATEGORY,
-    question: '中間調のみコントラストを上げる（入力0→出力0、入力128→出力200、入力255→出力255）を適用した結果はどれ？',
+    question: '全チャンネルにカーブ（入力0→出力0、入力128→出力200、入力255→出力255）を適用した結果はどれ？',
     sourceImage: 'gradient',
     choices: [
       {
@@ -166,8 +166,8 @@ export const toneCurveQuizzes: Quiz[] = [
       {
         label: 'C',
         processorFn: 'applyToneCurve',
-        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 0 }, { in: 255, out: 255 }] },
-        description: '変化なし',
+        params: { channel: 'rgb', curvePoints: [{ in: 0, out: 255 }, { in: 255, out: 0 }] },
+        description: '反転',
       },
       {
         label: 'D',
@@ -178,7 +178,7 @@ export const toneCurveQuizzes: Quiz[] = [
     ],
     answer: 1,
     explanation:
-      '中間点(128)を200に引き上げることで、中間調が全体的に明るくなります。両端(0と255)はそのまま保持されるため、純黒・純白は変わらず中間調の明るさが上がります。これはフォトレタッチでよく使われる「明るさ調整」の基本操作です。',
+      '中間点(128)を200へ引き上げ両端(0・255)を保持するカーブは、純黒・純白を残したまま中間調を明るく持ち上げます。中間調を暗くするカーブ（A）は逆に中央が64へ沈み、グラデーションが暗側に寄ります。反転（C）は明暗が逆転したネガ、均一グレー化（D）は階調が消えて全面が一様な中間グレーになり、いずれも「中間調が明るくなる」本問とは別物です。カーブの中間点を上げる／下げる向きの違いを理解しているかが問われます。',
   },
 ]
 
