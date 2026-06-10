@@ -11,7 +11,9 @@ function applyKernelWithScale(imageData: ImageData, kernel: number[][], scale: n
   const halfH = Math.floor(kH / 2)
   const halfW = Math.floor(kW / 2)
   const kSum = kernel.flat().reduce((a, b) => a + b, 0)
-  const divisor = scale !== 1 ? 1 / scale : (kSum !== 0 ? kSum : null)
+  // When scale=1: auto-normalize by kSum (same as applyKernel).
+  // When scale≠1: user explicitly overrides — multiply accumulated sum by scale.
+  const effectiveScale = scale !== 1 ? scale : (kSum !== 0 ? 1 / kSum : null)
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -28,10 +30,10 @@ function applyKernelWithScale(imageData: ImageData, kernel: number[][], scale: n
         }
       }
       const di = (y * width + x) * 4
-      if (divisor !== null) {
-        out[di]     = Math.max(0, Math.min(255, Math.round(r * divisor)))
-        out[di + 1] = Math.max(0, Math.min(255, Math.round(g * divisor)))
-        out[di + 2] = Math.max(0, Math.min(255, Math.round(b * divisor)))
+      if (effectiveScale !== null) {
+        out[di]     = Math.max(0, Math.min(255, Math.round(r * effectiveScale)))
+        out[di + 1] = Math.max(0, Math.min(255, Math.round(g * effectiveScale)))
+        out[di + 2] = Math.max(0, Math.min(255, Math.round(b * effectiveScale)))
       } else {
         out[di]     = Math.max(0, Math.min(255, Math.abs(Math.round(r)) + 128))
         out[di + 1] = Math.max(0, Math.min(255, Math.abs(Math.round(g)) + 128))
