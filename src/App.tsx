@@ -3,8 +3,9 @@ import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometri
 import type { Quiz } from './quizzes'
 import QuizSession from './components/QuizSession'
 import ResultScreen from './components/ResultScreen'
+import KernelPlayground from './components/KernelPlayground'
 
-type Screen = 'start' | 'quiz' | 'result'
+type Screen = 'start' | 'quiz' | 'result' | 'playground'
 
 type Category = {
   id: string
@@ -41,6 +42,10 @@ export default function App() {
 
   function handleRetry() {
     setScreen('start')
+  }
+
+  if (screen === 'playground') {
+    return <KernelPlayground onBack={() => setScreen('start')} />
   }
 
   if (screen === 'quiz') {
@@ -114,6 +119,23 @@ export default function App() {
         }}
       >
         開始する →
+      </button>
+      <button
+        onClick={() => setScreen('playground')}
+        style={{
+          marginTop: '0.75rem',
+          width: '100%',
+          padding: '0.875rem',
+          background: '#fff',
+          color: '#2563eb',
+          border: '2px solid #2563eb',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        }}
+      >
+        🔬 カーネルプレイグラウンド
       </button>
     </div>
   )
