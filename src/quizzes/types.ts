@@ -18,4 +18,5 @@ export type Quiz = {
     processorFn: string
     params: object
   }
+  showAxes?: boolean
 }

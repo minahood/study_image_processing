@@ -10,6 +10,8 @@ type Props = {
   sourceImage?: string
   width?: number
   height?: number
+  showAxes?: boolean
+  drawAxesFn?: (ctx: CanvasRenderingContext2D, w: number, h: number) => void
 }
 
 function resolveSourceImage(quizId?: string, sourceImage?: string): string {
@@ -26,6 +28,7 @@ export default function SourceImageCanvas({
   sourceImage,
   width = 200,
   height = 200,
+  drawAxesFn,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -34,6 +37,8 @@ export default function SourceImageCanvas({
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
     const type = resolveSourceImage(quizId, sourceImage)
+
+    const applyAxes = () => { if (drawAxesFn) drawAxesFn(ctx, width, height) }
 
     if (isRealImage(type)) {
       // Show loading state
@@ -47,6 +52,7 @@ export default function SourceImageCanvas({
       loadImage(realImagePath(type), width, height).then((img) => {
         if (canvasRef.current !== canvas) return // unmounted
         ctx.putImageData(img, 0, 0)
+        applyAxes()
       })
     } else {
       const img = generateSourceImage(type)
@@ -56,8 +62,9 @@ export default function SourceImageCanvas({
       off.getContext('2d')!.putImageData(img, 0, 0)
       ctx.clearRect(0, 0, width, height)
       ctx.drawImage(off, 0, 0, width, height)
+      applyAxes()
     }
-  }, [quizId, sourceImage, width, height])
+  }, [quizId, sourceImage, width, height, drawAxesFn])
 
   return <canvas ref={canvasRef} width={width} height={height} />
 }

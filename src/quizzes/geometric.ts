@@ -196,6 +196,7 @@ const geometricQuizzes: Quiz[] = [
     category: CATEGORY,
     question: COORD_Q1,
     sourceImage: 'shapes',
+    showAxes: true,
     choices: [
       {
         label: 'A',
@@ -231,6 +232,7 @@ const geometricQuizzes: Quiz[] = [
     category: CATEGORY,
     question: COORD_Q2,
     sourceImage: 'shapes',
+    showAxes: true,
     choices: [
       {
         label: 'A',
@@ -266,6 +268,7 @@ const geometricQuizzes: Quiz[] = [
     category: CATEGORY,
     question: COORD_Q3,
     sourceImage: 'shapes',
+    showAxes: true,
     choices: [
       {
         label: 'A',

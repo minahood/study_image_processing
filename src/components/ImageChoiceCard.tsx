@@ -10,9 +10,10 @@ type Props = {
   state: State
   onClick: () => void
   disabled: boolean
+  drawAxesFn?: (ctx: CanvasRenderingContext2D, w: number, h: number) => void
 }
 
-export default function ImageChoiceCard({ choice, sourceImage, state, onClick, disabled }: Props) {
+export default function ImageChoiceCard({ choice, sourceImage, state, onClick, disabled, drawAxesFn }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -39,9 +40,10 @@ export default function ImageChoiceCard({ choice, sourceImage, state, onClick, d
       off.getContext('2d')!.putImageData(processed, 0, 0)
       ctx.clearRect(0, 0, 150, 150)
       ctx.drawImage(off, 0, 0, 150, 150)
+      if (drawAxesFn) drawAxesFn(ctx, 150, 150)
     })
     return () => { cancelled = true }
-  }, [choice, sourceImage])
+  }, [choice, sourceImage, drawAxesFn])
 
   const borderColor = state === 'correct' ? '#16a34a'
     : state === 'wrong' ? '#dc2626'
