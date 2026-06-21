@@ -1,0 +1,3032 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #fcfbf8; font-family: Merriweather; color: #141416; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 64px; font-weight: 400; position: static; text-transform: none">
+
+  <!-- ========================= START ========================= -->
+  <sc-if value="{{ isStart }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="スタート" style="width:420px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="padding:28px 28px 22px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#e0411c;">IMAGE PROCESSING · QUIZ</div>
+        <h1 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:36px; font-weight:800; color:#141416; margin:10px 0 0; letter-spacing:-0.03em; line-height:1.04;">画像処理<br>クイズ</h1>
+        <p style="font-size:13px; line-height:1.7; color:#56565c; margin:14px 0 0;">4択で画像処理の基礎を学ぶブラウザ完結型の学習サイト。　すべての処理結果はその場で計算しています。</p>
+      </div>
+      <div style="padding:18px 28px 0;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; padding-bottom:6px; border-bottom:1px solid #e2e0da;">CATEGORY</div>
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+          <div onClick="{{ cat.onClick }}" style="{{ cat.rowStyle }}">
+            <div style="display:flex; align-items:baseline; gap:11px;">
+              <span style="{{ cat.numStyle }}">{{ cat.num }}</span>
+              <span style="{{ cat.labelStyle }}">{{ cat.label }}</span>
+            </div>
+            <span style="{{ cat.countStyle }}">{{ cat.count }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:20px 28px 26px;">
+        <button onClick="{{ onStart }}" style="width:100%; padding:15px; background:#e0411c; color:#fff; font-weight:700; font-size:15px; letter-spacing:0.04em; border:none; cursor:pointer; font-family:inherit;">開始する →</button>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:18px; margin-bottom:2px;">
+          <div style="flex:1; height:1px; background:#e2e0da;"></div>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0;">エフェクトテストプレイ</span>
+          <div style="flex:1; height:1px; background:#e2e0da;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-top:9px;">
+          <button onClick="{{ onPlayground }}" style="padding:12px 6px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:0.03em; cursor:pointer;">⌖ KERNEL</button>
+          <button onClick="{{ onThreshold }}" style="padding:12px 6px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:0.03em; cursor:pointer;">◧ THRESHOLD</button>
+          <button onClick="{{ onFourier }}" style="padding:12px 6px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:0.03em; cursor:pointer;">∿ FOURIER</button>
+          <button onClick="{{ onTonePG }}" style="padding:12px 6px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:0.03em; cursor:pointer;">⟋ TONE CURVE</button>
+          <button onClick="{{ onGeoPG }}" style="grid-column:span 2; padding:12px 6px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:12px; font-family:'JetBrains Mono',monospace; letter-spacing:0.03em; cursor:pointer;">⊞ GEOMETRIC（行列変換）</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= QUIZ ========================= -->
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="クイズ" style="width:560px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .3s ease both;">
+      <div style="display:flex; align-items:stretch; border-bottom:1.5px solid #1a1a1c;">
+        <div style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:40px; font-weight:800; color:#141416; padding:14px 20px; border-right:1.5px solid #1a1a1c; letter-spacing:-0.04em; line-height:1; display:flex; align-items:center;">{{ qNumber }}</div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:10px 18px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.16em; color:#e0411c;">{{ qCatLabel }}</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa0; margin-top:3px;">QUESTION {{ qNumber }} / {{ qTotal }}</div>
+        </div>
+        <button onClick="{{ onQuit }}" style="border:none; border-left:1px solid #e2e0da; background:#fcfbf8; padding:0 16px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa0; cursor:pointer;">EXIT</button>
+      </div>
+      <div style="display: flex; gap: 2px; height: 8px; background: #f0ede6; cursor: pointer">
+        <sc-for list="{{ progressSegments }}" as="seg" hint-placeholder-count="8">
+          <div onClick="{{ seg.onClick }}" title="{{ seg.title }}" style="{{ seg.style }}"></div>
+        </sc-for>
+      </div>
+      <div style="padding:18px 22px 0;">
+        <p style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:17px; line-height:1.6; color:#141416; margin:0 0 16px; font-weight:600; letter-spacing:-0.01em;">{{ qPre }}<span style="color:#e0411c;">{{ qHi }}</span>{{ qPost }}</p>
+        <sc-if value="{{ showStdSource }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin-bottom:5px; letter-spacing:0.1em;">SOURCE — 元画像</div>
+            <canvas id="q-source" style="width:258px; height:150px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+          </div>
+          <sc-if value="{{ showKernel }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">KERNEL — カーネル</div>
+              <div style="display:grid; grid-template-columns:repeat(3,46px); border:1.5px solid #1a1a1c; width:max-content;">
+                <sc-for list="{{ kernelCells }}" as="k" hint-placeholder-count="9">
+                  <div style="{{ k.style }}">{{ k.v }}</div>
+                </sc-for>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#56565c; margin-top:8px;">倍率 <span style="color:#141416; font-weight:700;">{{ kernelScaleLabel }}</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showCurve }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">TONE CURVE — トーンカーブ</div>
+              <svg width="150" height="150" viewBox="0 0 150 150" style="display:block; border:1.5px solid #1a1a1c; background:#fff;">
+                <line x1="0" y1="112.5" x2="150" y2="37.5" stroke="#e2e0da" stroke-width="1" stroke-dasharray="3 3"></line>
+                <line x1="37.5" y1="0" x2="37.5" y2="150" stroke="#f0ede6" stroke-width="1"></line>
+                <line x1="75" y1="0" x2="75" y2="150" stroke="#f0ede6" stroke-width="1"></line>
+                <line x1="112.5" y1="0" x2="112.5" y2="150" stroke="#f0ede6" stroke-width="1"></line>
+                <line x1="0" y1="37.5" x2="150" y2="37.5" stroke="#f0ede6" stroke-width="1"></line>
+                <line x1="0" y1="75" x2="150" y2="75" stroke="#f0ede6" stroke-width="1"></line>
+                <line x1="0" y1="112.5" x2="150" y2="112.5" stroke="#f0ede6" stroke-width="1"></line>
+                <polyline points="{{ curvePath }}" fill="none" stroke="#e0411c" stroke-width="2.5" stroke-linejoin="round"></polyline>
+              </svg>
+              <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; color:#9a9aa0; margin-top:4px; width:150px;"><span>入力 0</span><span>→</span><span>255</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showFilter }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">FILTER — 周波数フィルタ</div>
+              <canvas id="q-filter" style="width:150px; height:150px; display:block; border:1.5px solid #1a1a1c; background:#000;"></canvas>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#9a9aa0; margin-top:4px; width:150px; line-height:1.5;">中心=原点 / 白=1・黒=0</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showSpectrumInfo }}" hint-placeholder-val="{{ false }}">
+            <div style="max-width:226px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">SPECTRUM — 振幅スペクトルの見方</div>
+              <div style="border:1.5px solid #1a1a1c; padding:11px 13px; font-size:11.5px; line-height:1.75; color:#3a3a40; background:#fff;">
+                選択肢A〜Dは<strong style="color:#141416;">振幅スペクトル</strong>（周波数成分の強さ）の画像です。<br>
+                ・<strong style="color:#141416;">中心</strong>＝低周波（なだらか）<br>
+                ・<strong style="color:#141416;">外側</strong>＝高周波（細かい）<br>
+                ・<strong style="color:#141416;">輝点</strong>＝その周波数・方向が強い<br>
+                縞の向きと輝点が並ぶ向きは<strong style="color:#141416;">直交</strong>します。
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ isToneId }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin-bottom:5px; letter-spacing:0.1em;">SOURCE — 元画像</div>
+              <canvas id="q-source" style="width:100%; height:148px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">RESULT — 処理後</div>
+              <canvas id="q-result" style="width:100%; height:148px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isHistQ }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin-bottom:5px; letter-spacing:0.1em;">〈1〉 グレースケール画像</div>
+              <canvas id="q-hist-src" style="width:226px; height:132px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">〈2〉 2値画像</div>
+              <canvas id="q-hist-bin" style="width:226px; height:132px; display:block; border:1.5px solid #1a1a1c; background:#fff;"></canvas>
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin-bottom:5px; letter-spacing:0.1em;">図3 — 〈1〉の濃淡ヒストグラム</div>
+            <canvas id="q-hist" style="width:480px; height:188px; max-width:100%; display:block; border:1.5px solid #1a1a1c; background:#fff;"></canvas>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isHistMatch }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin-bottom:7px; letter-spacing:0.1em;">画像 — 図5・図6・図7（グレースケール）</div>
+          <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+            <sc-for list="{{ hmImgs }}" as="im" hint-placeholder-count="3">
+              <div>
+                <canvas id="q-hm-img-{{ im.idx }}" style="width: 160px; height: 118px; display: block; border: 1.5px solid #1a1a1c; background: #e9e7e1"></canvas>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#141416; margin-top:5px; text-align:center; letter-spacing:0.08em;">{{ im.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; margin:16px 0 7px; letter-spacing:0.1em;">濃淡ヒストグラム — 図8・図9・図10（横軸=画素値 0→255）</div>
+          <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+            <sc-for list="{{ hmHists }}" as="hh" hint-placeholder-count="3">
+              <div>
+                <canvas id="q-hm-hist-{{ hh.idx }}" style="width:228px; height:150px; display:block; border:1.5px solid #1a1a1c; background:#fff;"></canvas>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#141416; margin-top:5px; text-align:center; letter-spacing:0.08em;">{{ hh.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGeo }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ geoCompose3 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <sc-for list="{{ geoStages }}" as="s" hint-placeholder-count="3">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#2a6fdb; margin-bottom:5px; letter-spacing:0.08em;">{{ s.label }}</div>
+                    <canvas id="g-c{{ s.idx }}" style="width:172px; height:172px; display:block; border:1.5px solid #1a1a1c; background:#fff;"></canvas>
+                  </div>
+                  <sc-if value="{{ s.showArrow }}" hint-placeholder-val="{{ false }}">
+                    <div style="align-self:center; display:flex; flex-direction:column; align-items:center; padding-top:14px;">
+                      
+                      
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ geoShowStages }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#2a6fdb; margin-bottom:5px; letter-spacing:0.1em;">{{ geoBeforeLabel }}</div>
+              <canvas id="g-before" style="width: 240px; height: 240px; display: block; border: 1.5px solid #1a1a1c; background: #fff"></canvas>
+            </div>
+            <sc-if value="{{ geoShowMatrix }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.12em;">変換式 ①</div>
+                <div style="padding: 9px 12px; border: 1.5px solid #1a1a1c; background: #fff; width: 220px; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 16px">{{ matrixEl }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ geoShowAfter }}" hint-placeholder-val="{{ false }}">
+              
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; margin-bottom:5px; letter-spacing:0.1em;">{{ geoAfterLabel }}</div>
+                <canvas id="g-after" style="width: 240px; height: 240px; display: block; border: 1.5px solid #1a1a1c; background: #fff"></canvas>
+              </div>
+            </sc-if>
+          </div>
+          </sc-if>
+        </sc-if>
+      </div>
+      <div style="padding:18px 22px 0;">
+        <div style="{{ choiceGridStyle }}">
+          <sc-for list="{{ choices }}" as="ch" hint-placeholder-count="4">
+            <div onClick="{{ ch.onClick }}" style="{{ ch.cellStyle }}">
+              <sc-if value="{{ ch.isCanvas }}" hint-placeholder-val="{{ true }}">
+                <canvas id="q-choice-{{ ch.idx }}" style="{{ ch.canvasStyle }}"></canvas>
+              </sc-if>
+              <sc-if value="{{ ch.isMath }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ ch.mathCellStyle }}">{{ ch.mathEl }}</div>
+              </sc-if>
+              <span style="position:absolute; top:0; left:0; font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; font-weight:800; background:#1a1a1c; color:#fff; padding:2px 9px; z-index:2;">{{ ch.label }}</span>
+              <sc-if value="{{ ch.showCorrect }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute; bottom:0; right:0; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; background:#1f9d57; color:#fff; padding:3px 8px; letter-spacing:0.1em;">CORRECT</span>
+              </sc-if>
+              <sc-if value="{{ ch.showWrong }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute; bottom:0; right:0; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; background:#1a1a1c; color:#fff; padding:3px 8px; letter-spacing:0.06em;">✕ あなたの解答</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ notAnswered }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:16px 22px 22px;">
+          <div style="text-align:center; padding:13px; border:1.5px dashed #cfccc4; color:#9a9aa0; font-weight:600; font-size:13px; font-family:'JetBrains Mono',monospace; letter-spacing:0.08em;">SELECT AN ANSWER ↑</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ answered }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:16px 22px 0;">
+          <div style="{{ verdictStyle }}">{{ verdictText }}</div>
+          <div style="border-left:3px solid #e0411c; padding:2px 0 2px 14px; margin-top:14px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#e0411c; margin-bottom:5px;">EXPLANATION</div>
+            <p style="font-size:13px; line-height:1.75; color:#3a3a40; margin:0;">{{ explanation }}</p>
+          </div>
+          <div style="margin-top:16px; border-top:1px solid #e2e0da; padding-top:13px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:9px;">EACH OPTION — 各選択肢</div>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+              <sc-for list="{{ choiceDescs }}" as="d" hint-placeholder-count="4">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <span style="{{ d.labelStyle }}">{{ d.label }}</span>
+                  <span style="{{ d.textStyle }}">{{ d.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="padding:18px 22px 22px;">
+          <button onClick="{{ onNext }}" style="width:100%; padding:14px; background:#1a1a1c; color:#fff; font-weight:700; font-size:14px; letter-spacing:0.04em; border:none; cursor:pointer; font-family:inherit;">{{ nextLabel }}</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ========================= RESULT ========================= -->
+  <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="結果" style="width:420px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="padding:22px 28px 16px; border-bottom:1.5px solid #1a1a1c; display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#e0411c;">RESULT</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa0;">{{ resultCatLabel }}</div>
+      </div>
+      <div style="padding:32px 28px 8px; text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#9a9aa0; margin-bottom:8px;">SCORE</div>
+        <div style="display:flex; align-items:baseline; justify-content:center; gap:6px; font-family:'Helvetica Neue',Arial,sans-serif;">
+          <span style="font-size:88px; font-weight:800; color:#141416; letter-spacing:-0.05em; line-height:0.9;">{{ score }}</span>
+          <span style="font-size:34px; font-weight:700; color:#bdbdc2; letter-spacing:-0.03em;">/{{ total }}</span>
+        </div>
+      </div>
+      <div style="padding:10px 28px 0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa0; margin-bottom:6px;"><span>正答率</span><span style="{{ percentStyle }}">{{ percent }}%</span></div>
+        <div style="height:8px; border:1.5px solid #1a1a1c; overflow:hidden;"><div style="{{ resultBarStyle }}"></div></div>
+      </div>
+      <div style="padding:22px 28px 0;">
+        <div style="border-left:3px solid #e0411c; padding:2px 0 2px 14px;">
+          <p style="font-size:13.5px; line-height:1.7; color:#141416; margin:0; font-weight:600;">{{ message }}</p>
+        </div>
+      </div>
+      <div style="padding:24px 28px 28px; display:flex; gap:10px;">
+        <button onClick="{{ onRetry }}" style="flex:1; padding:14px; background:#1a1a1c; color:#fff; font-weight:700; font-size:14px; border:none; cursor:pointer; font-family:inherit;">もう一度</button>
+        <button onClick="{{ onBack }}" style="flex:1; padding:14px; background:#fcfbf8; border:1.5px solid #1a1a1c; color:#1a1a1c; font-weight:700; font-size:13px; cursor:pointer; font-family:'JetBrains Mono',monospace;">ホームに戻る</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= PLAYGROUND ========================= -->
+  <sc-if value="{{ isPlayground }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="プレイグラウンド" style="width:760px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ onBack }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; border:1.5px solid #1a1a1c; padding:5px 11px; color:#1a1a1c; background:#fcfbf8; cursor:pointer;">← BACK</button>
+          <h2 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:20px; font-weight:800; margin:0; letter-spacing:-0.02em;">カーネルプレイグラウンド</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#e0411c;">3×3 CONVOLUTION</div>
+      </div>
+
+      <div style="padding:16px 24px; border-bottom:1px solid #e2e0da;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">SOURCE IMAGE</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ pgImages }}" as="im" hint-placeholder-count="5">
+            <span onClick="{{ im.onClick }}" style="{{ im.style }}">{{ im.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0; border-bottom:1.5px solid #1a1a1c;">
+        <div style="flex:1; padding:22px 24px; border-right:1.5px solid #1a1a1c;">
+          <div style="display:flex; gap:14px; align-items:center;">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; letter-spacing:0.1em; margin-bottom:6px;">元画像</div>
+              <canvas id="pg-source" style="width:212px; height:212px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+            </div>
+            <div style="color:#e0411c; font-family:'JetBrains Mono',monospace; font-size:20px;">→</div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.1em; margin-bottom:6px;">適用後</div>
+              <canvas id="pg-result" style="width:212px; height:212px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:0 0 auto; padding:22px 24px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">KERNEL 3×3</div>
+          <div style="display:grid; grid-template-columns:repeat(3,48px); border:1.5px solid #1a1a1c; width:max-content;">
+            <sc-for list="{{ pgCells }}" as="cell" hint-placeholder-count="9">
+              <div style="border:0.5px solid #e2e0da; height:48px;">
+                <input type="number" step="any" value="{{ cell.v }}" onChange="{{ cell.onChange }}" style="width:100%; height:100%; text-align:center; border:none; background:transparent; font-family:'JetBrains Mono',monospace; font-size:15px; color:#141416; padding:0; outline:none;">
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#56565c; margin-top:10px;">合計 <span style="color:#141416; font-weight:700;">{{ pgSum }}</span><span style="{{ pgSumNote }}"> · 平坦部グレー</span></div><div style="display:flex; align-items:center; gap:8px; margin-top:14px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#56565c;">倍率 ×</span>
+            <input type="text" value="{{ pgScaleInput }}" onChange="{{ onScaleChange }}" style="width:64px; height:32px; text-align:center; border:1.5px solid #1a1a1c; background:#fcfbf8; font-family:'JetBrains Mono',monospace; font-size:13px; color:#141416; padding:0 4px; outline:none;">
+            <span style="font-size:10px; color:#bdbdc2;">分数可 1/9</span>
+          </div>
+          
+        </div>
+      </div>
+
+      <div style="padding:18px 24px 22px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:12px;">PRESETS</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); border:1.5px solid #1a1a1c;">
+          <sc-for list="{{ pgPresets }}" as="p" hint-placeholder-count="8">
+            <div onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="{{ p.numStyle }}">{{ p.num }}</span> {{ p.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= FOURIER PLAYGROUND ========================= -->
+  <sc-if value="{{ isFourier }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="フーリエプレイグラウンド" style="width:780px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ onBack }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; border:1.5px solid #1a1a1c; padding:5px 11px; color:#1a1a1c; background:#fcfbf8; cursor:pointer;">← BACK</button>
+          <h2 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:20px; font-weight:800; margin:0; letter-spacing:-0.02em;">フーリエプレイグラウンド</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#e0411c;">SPECTRUM EDITOR</div>
+      </div>
+
+      <div style="padding:14px 24px; border-bottom:1px solid #e2e0da; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0;">IMAGE</span>
+        <div style="display:flex; flex-wrap:wrap; gap:7px;">
+          <sc-for list="{{ fpImages }}" as="im" hint-placeholder-count="6">
+            <span onClick="{{ im.onClick }}" style="{{ im.style }}">{{ im.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:14px; align-items:flex-end; justify-content:center; padding:22px 24px 18px; border-bottom:1.5px solid #1a1a1c;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; letter-spacing:0.1em; margin-bottom:6px;">元画像 f(x,y)</div>
+          <canvas id="fp-source" style="width:200px; height:200px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1; image-rendering:auto;"></canvas>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; padding-bottom:84px; color:#e0411c; font-family:'JetBrains Mono',monospace;">
+          <span style="font-size:18px;">→</span>
+          <span style="font-size:8px; letter-spacing:0.1em;">FFT</span>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.1em; margin-bottom:6px;">振幅スペクトル（編集可）</div>
+          <canvas id="fp-spectrum" style="width:200px; height:200px; display:block; border:1.5px solid #e0411c; background:#000; cursor:crosshair; touch-action:none; image-rendering:auto;"></canvas>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; padding-bottom:84px; color:#e0411c; font-family:'JetBrains Mono',monospace;">
+          <span style="font-size:18px;">→</span>
+          <span style="font-size:8px; letter-spacing:0.1em;">IFFT</span>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#1f9d57; letter-spacing:0.1em; margin-bottom:6px;">出力画像 f′(x,y)</div>
+          <canvas id="fp-result" style="width:200px; height:200px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1; image-rendering:auto;"></canvas>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0; border-bottom:1.5px solid #1a1a1c;">
+        <div style="flex:1; padding:18px 24px; border-right:1.5px solid #1a1a1c;">
+          <div style="display:flex; gap:22px; flex-wrap:wrap; margin-bottom:16px;">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#9a9aa0; margin-bottom:7px;">① スペクトル描画</div>
+              <div style="display:flex; gap:0; border:1.5px solid #1a1a1c; width:max-content;">
+                <sc-for list="{{ fpDrawBrushes }}" as="b" hint-placeholder-count="2">
+                  <div onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#e0411c; margin-bottom:7px;">② フィルタ（マスク）</div>
+              <div style="display:flex; gap:0; border:1.5px solid #e0411c; width:max-content;">
+                <sc-for list="{{ fpFilterBrushes }}" as="b" hint-placeholder-count="2">
+                  <div onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; color:transparent; margin-bottom:7px;">.</div>
+              <button onClick="{{ onFpReload }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; padding:8px 14px; border:1.5px solid #1a1a1c; background:#fcfbf8; color:#1a1a1c; cursor:pointer; white-space:nowrap; height:35px;">⟳ 初期化</button>
+            </div>
+          </div><div style="display:flex; align-items:center; gap:18px;">
+            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+              <span style="font-family: Open Sans; font-size: 12px; color: #56565c; white-space: nowrap; text-decoration-line: none; font-style: normal; font-weight: 500">筆サイズ</span>
+              <input type="range" min="0.2" max="10" step="0.1" value="{{ fpBrushSize }}" onChange="{{ onBrushSize }}" onInput="{{ onBrushSize }}" style="flex:1; accent-color:#e0411c;">
+              <span style="font-family: 'JetBrains Mono',monospace; font-size: 12px; color: #141416; font-weight: 700; text-align: right">{{ fpBrushSize }}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex:0 0 auto;">
+              
+              <div style="display:flex; gap:0; border:1.5px solid #1a1a1c; width:max-content;">
+                <sc-for list="{{ fpBrushShapes }}" as="s" hint-placeholder-count="2">
+                  <div onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div style="flex:0 0 auto; padding:18px 24px; max-width:218px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; line-height:1.7;">
+            中央＝低周波／外側＝高周波。<br>
+            <span style="color:#1a1a1c;">①描画</span>でスペクトルの値そのものを白(追加)/黒(除去)に編集。<span style="color:#e0411c;">②フィルタ</span>で周波数を遮断/通過（赤い領域＝遮断中）。出力＝編集後スペクトル×フィルタの逆変換。対称点も自動編集。
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:16px 24px 22px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:12px;">PRESETS</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); border:1.5px solid #1a1a1c;">
+          <sc-for list="{{ fpPresets }}" as="p" hint-placeholder-count="4">
+            <div onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="{{ p.numStyle }}">{{ p.num }}</span> {{ p.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= THRESHOLD PLAYGROUND ========================= -->
+  <sc-if value="{{ isThreshold }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="二値化プレイグラウンド" style="width:608px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ onBack }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; border:1.5px solid #1a1a1c; padding:5px 11px; color:#1a1a1c; background:#fcfbf8; cursor:pointer;">← BACK</button>
+          <h2 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:20px; font-weight:800; margin:0; letter-spacing:-0.02em;">二値化プレイグラウンド</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#e0411c;">THRESHOLDING</div>
+      </div>
+
+      <div style="padding:16px 24px; border-bottom:1px solid #e2e0da;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">SOURCE IMAGE</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ thImages }}" as="im" hint-placeholder-count="6">
+            <span onClick="{{ im.onClick }}" style="{{ im.style }}">{{ im.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:14px; align-items:center; justify-content:center; padding:22px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; letter-spacing:0.1em; margin-bottom:6px;">グレースケール</div>
+          <canvas id="th-source" style="width:236px; height:184px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+        </div>
+        <div style="color:#e0411c; font-family:'JetBrains Mono',monospace; font-size:20px;">→</div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.1em; margin-bottom:6px;">二値化結果</div>
+          <canvas id="th-result" style="width:236px; height:184px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+        </div>
+      </div>
+
+      <div style="padding:20px 24px 24px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">濃淡ヒストグラム — 赤い線をドラッグしてしきい値を移動</div>
+        <canvas id="th-hist" onPointerDown="{{ onThHistDown }}" onPointerMove="{{ onThHistMove }}" onPointerUp="{{ onThHistUp }}" style="width:100%; height:206px; display:block; border:1.5px solid #1a1a1c; background:#fff; cursor:ew-resize; touch-action:none;"></canvas>
+
+        <div style="display:flex; align-items:center; gap:18px; margin-top:18px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:240px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#56565c; white-space:nowrap;">しきい値 t</span>
+            <input type="range" min="0" max="255" step="1" value="{{ thValue }}" onChange="{{ onThValue }}" onInput="{{ onThValue }}" style="flex:1; accent-color:#e0411c;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:14px; color:#141416; font-weight:700; width:34px; text-align:right;">{{ thValue }}</span>
+          </div>
+          <button onClick="{{ onThOtsu }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; padding:9px 14px; border:1.5px solid #1a1a1c; background:#fcfbf8; color:#1a1a1c; cursor:pointer; white-space:nowrap;">⊙ 大津法で自動</button>
+          <div onClick="{{ onThInvert }}" style="{{ thInvertStyle }}">⇄ 白黒反転</div>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#56565c; margin-top:14px; line-height:1.6;">
+          {{ thRule }} → 白い画素 <strong style="color:#e0411c; font-weight:700;">{{ thWhitePct }}%</strong> ／ 黒い画素 {{ thBlackPct }}%
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= TONE CURVE PLAYGROUND ========================= -->
+  <sc-if value="{{ isTonePG }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="トーンカーブプレイグラウンド" style="width:580px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ onBack }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; border:1.5px solid #1a1a1c; padding:5px 11px; color:#1a1a1c; background:#fcfbf8; cursor:pointer;">← BACK</button>
+          <h2 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:20px; font-weight:800; margin:0; letter-spacing:-0.02em;">トーンカーブプレイグラウンド</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#e0411c;">TONE CURVE</div>
+      </div>
+
+      <div style="padding:16px 24px; border-bottom:1px solid #e2e0da;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">SOURCE IMAGE</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ tcImages }}" as="im" hint-placeholder-count="6">
+            <span onClick="{{ im.onClick }}" style="{{ im.style }}">{{ im.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px; align-items:center;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0;">CHANNEL</span>
+          <sc-for list="{{ tcChannels }}" as="ch" hint-placeholder-count="4">
+            <span onClick="{{ ch.onClick }}" style="{{ ch.style }}">{{ ch.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:24px; padding:22px 24px 24px; align-items:flex-start;">
+        <div style="flex:none; width:276px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:8px;">トーンカーブ — 点を上下にドラッグ</div>
+          <canvas id="tc-curve" onPointerDown="{{ onTcDown }}" onPointerMove="{{ onTcMove }}" onPointerUp="{{ onTcUp }}" style="width:276px; height:276px; display:block; border:1.5px solid #1a1a1c; background:#fff; touch-action:none; cursor:ns-resize;"></canvas>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
+            <sc-for list="{{ tcPresets }}" as="p" hint-placeholder-count="6">
+              <span onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</span>
+            </sc-for>
+          </div>
+          <div onClick="{{ onTcSmooth }}" style="{{ tcSmoothStyle }}"><span style="{{ tcSmoothDot }}"></span><span>なめらか（曲線）</span></div>
+        </div>
+        <div style="flex:none; width:216px; display:flex; flex-direction:column; gap:14px; align-items:center;">
+          <div style="width:100%;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; letter-spacing:0.1em; margin-bottom:6px;">元画像</div>
+            <canvas id="tc-source" style="width:216px; height:162px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+          </div>
+          <div style="width:100%;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.1em; margin-bottom:6px;">適用結果</div>
+            <canvas id="tc-result" style="width:216px; height:162px; display:block; border:1.5px solid #1a1a1c; background:#e9e7e1;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ========================= GEOMETRIC PLAYGROUND ========================= -->
+  <sc-if value="{{ isGeoPG }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="幾何学的変換プレイグラウンド" style="width:580px; background:#fcfbf8; border:1px solid #1a1a1c; border-radius:4px; overflow:hidden; box-shadow:0 22px 50px -28px rgba(0,0,0,0.4); animation:fadeUp .35s ease both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button onClick="{{ onBack }}" style="font-family:'JetBrains Mono',monospace; font-size:12px; border:1.5px solid #1a1a1c; padding:5px 11px; color:#1a1a1c; background:#fcfbf8; cursor:pointer;">← BACK</button>
+          <h2 style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:20px; font-weight:800; margin:0; letter-spacing:-0.02em;">幾何学的変換プレイグラウンド</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#e0411c;">GEOMETRIC</div>
+      </div>
+
+      <div style="padding:16px 24px; border-bottom:1px solid #e2e0da;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0; margin-bottom:10px;">SOURCE IMAGE</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ gpImages }}" as="im" hint-placeholder-count="6">
+            <span onClick="{{ im.onClick }}" style="{{ im.style }}">{{ im.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:14px; align-items:center; justify-content:center; padding:20px 24px; border-bottom:1.5px solid #1a1a1c;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa0; letter-spacing:0.1em; margin-bottom:6px;">変換前（青）</div>
+          <canvas id="gp-before" style="width: 220px; height: 220px; display: block; border: 1.5px solid #1a1a1c; background: #fff"></canvas>
+        </div>
+        <div style="color:#e0411c; font-family:'JetBrains Mono',monospace; font-size:20px;">→</div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#e0411c; letter-spacing:0.1em; margin-bottom:6px;">変換後（赤）</div>
+          <canvas id="gp-after" style="width: 220px; height: 220px; display: block; border: 1.5px solid #1a1a1c; background: #fff"></canvas>
+        </div>
+      </div>
+
+      <div style="padding:20px 24px 24px;">
+        <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:16px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#9a9aa0;">変換行列（同次座標）</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#1a1a1c; display:flex; align-items:baseline; gap:5px; letter-spacing:0.02em;">
+            <span>[x′&nbsp;y′&nbsp;w]<sup style="font-size:0.62em; top:-0.5em; position:relative;">T</sup></span>
+            <span style="color:#9a9aa0;">=</span>
+            <span style="color:#e0411c; font-weight:700;">R</span>
+            <span style="color:#9a9aa0;">·</span>
+            <span style="color:#2a6fdb; font-weight:700;">M</span>
+            <span style="color:#9a9aa0;">·</span>
+            <span>[x&nbsp;y&nbsp;1]<sup style="font-size:0.62em; top:-0.5em; position:relative;">T</sup></span>
+          </div></div>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:nowrap;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e0411c; font-weight:700; margin-bottom:6px; text-align:center;">R</div>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="font-size:64px; color:#1a1a1c; font-weight:200; line-height:1;">[</span>
+              <div style="display:grid; grid-template-columns:auto auto auto; gap:6px;">
+                <input type="text" inputmode="decimal" value="{{ gr00 }}" onChange="{{ onGr00 }}" onInput="{{ onGr00 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr01 }}" onChange="{{ onGr01 }}" onInput="{{ onGr01 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr02 }}" onChange="{{ onGr02 }}" onInput="{{ onGr02 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr10 }}" onChange="{{ onGr10 }}" onInput="{{ onGr10 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr11 }}" onChange="{{ onGr11 }}" onInput="{{ onGr11 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr12 }}" onChange="{{ onGr12 }}" onInput="{{ onGr12 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr20 }}" onChange="{{ onGr20 }}" onInput="{{ onGr20 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr21 }}" onChange="{{ onGr21 }}" onInput="{{ onGr21 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gr22 }}" onChange="{{ onGr22 }}" onInput="{{ onGr22 }}" style="{{ gpInputStyle }}">
+              </div>
+              <span style="font-size:64px; color:#1a1a1c; font-weight:200; line-height:1;">]</span>
+            </div>
+          </div>
+          <span style="font-size:24px; color:#9a9aa0; line-height:1;">·</span>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#2a6fdb; font-weight:700; margin-bottom:6px; text-align:center;">M</div>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="font-size:64px; color:#1a1a1c; font-weight:200; line-height:1;">[</span>
+              <div style="display:grid; grid-template-columns:auto auto auto; gap:6px;">
+                <input type="text" inputmode="decimal" value="{{ gm00 }}" onChange="{{ onGm00 }}" onInput="{{ onGm00 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm01 }}" onChange="{{ onGm01 }}" onInput="{{ onGm01 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm02 }}" onChange="{{ onGm02 }}" onInput="{{ onGm02 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm10 }}" onChange="{{ onGm10 }}" onInput="{{ onGm10 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm11 }}" onChange="{{ onGm11 }}" onInput="{{ onGm11 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm12 }}" onChange="{{ onGm12 }}" onInput="{{ onGm12 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm20 }}" onChange="{{ onGm20 }}" onInput="{{ onGm20 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm21 }}" onChange="{{ onGm21 }}" onInput="{{ onGm21 }}" style="{{ gpInputStyle }}">
+                <input type="text" inputmode="decimal" value="{{ gm22 }}" onChange="{{ onGm22 }}" onInput="{{ onGm22 }}" style="{{ gpInputStyle }}">
+              </div>
+              <span style="font-size:64px; color:#1a1a1c; font-weight:200; line-height:1;">]</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:nowrap; margin-top:16px;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#e0411c; margin-bottom:8px;">R にプリセットを代入</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <sc-for list="{{ gpPresetsR }}" as="p" hint-placeholder-count="6">
+                <span onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</span>
+              </sc-for>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">回転</span>
+                <input type="range" min="-180" max="180" step="1" value="{{ gpRotR }}" onInput="{{ onGpRotR }}" style="flex:1; accent-color:#e0411c; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#e0411c; width:46px; text-align:right;">{{ gpRotRLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">拡大</span>
+                <input type="range" min="0.5" max="1.5" step="0.05" value="{{ gpScaleR }}" onInput="{{ onGpScaleR }}" style="flex:1; accent-color:#e0411c; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#e0411c; width:46px; text-align:right;">{{ gpScaleRLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">平行x</span>
+                <input type="range" min="-4" max="4" step="0.1" value="{{ gpTxR }}" onInput="{{ onGpTxR }}" style="flex:1; accent-color:#e0411c; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#e0411c; width:46px; text-align:right;">{{ gpTxRLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">平行y</span>
+                <input type="range" min="-4" max="4" step="0.1" value="{{ gpTyR }}" onInput="{{ onGpTyR }}" style="flex:1; accent-color:#e0411c; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#e0411c; width:46px; text-align:right;">{{ gpTyRLabel }}</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.14em; color:#2a6fdb; margin-bottom:8px;">M にプリセットを代入</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <sc-for list="{{ gpPresetsM }}" as="p" hint-placeholder-count="6">
+                <span onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</span>
+              </sc-for>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">回転</span>
+                <input type="range" min="-180" max="180" step="1" value="{{ gpRotM }}" onInput="{{ onGpRotM }}" style="flex:1; accent-color:#2a6fdb; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#2a6fdb; width:46px; text-align:right;">{{ gpRotMLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">拡大</span>
+                <input type="range" min="0.5" max="1.5" step="0.05" value="{{ gpScaleM }}" onInput="{{ onGpScaleM }}" style="flex:1; accent-color:#2a6fdb; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#2a6fdb; width:46px; text-align:right;">{{ gpScaleMLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">平行x</span>
+                <input type="range" min="-4" max="4" step="0.1" value="{{ gpTxM }}" onInput="{{ onGpTxM }}" style="flex:1; accent-color:#2a6fdb; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#2a6fdb; width:46px; text-align:right;">{{ gpTxMLabel }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#9a9aa0; width:42px;">平行y</span>
+                <input type="range" min="-4" max="4" step="0.1" value="{{ gpTyM }}" onInput="{{ onGpTyM }}" style="flex:1; accent-color:#2a6fdb; height:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#2a6fdb; width:46px; text-align:right;">{{ gpTyMLabel }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  imgs = {};
+  srcCache = {};
+
+  K = {
+    box:[[1,1,1],[1,1,1],[1,1,1]],
+    gaussian:[[1,2,1],[2,4,2],[1,2,1]],
+    sharpen:[[0,-1,0],[-1,5,-1],[0,-1,0]],
+    edge:[[-1,-1,-1],[-1,8,-1],[-1,-1,-1]],
+    laplacian:[[0,1,0],[1,-4,1],[0,1,0]],
+    sobelX:[[-1,0,1],[-2,0,2],[-1,0,1]],
+    sobelY:[[-1,-2,-1],[0,0,0],[1,2,1]],
+    emboss:[[-2,-1,0],[-1,1,1],[0,1,2]],
+    strongSharpen:[[-1,-1,-1],[-1,9,-1],[-1,-1,-1]],
+    identity:[[0,0,0],[0,1,0],[0,0,0]],
+  };
+
+  CV = {
+    brighten:[{in:0,out:0},{in:128,out:192},{in:255,out:255}],
+    invert:[{in:0,out:255},{in:255,out:0}],
+    darken:[{in:0,out:0},{in:255,out:150}],
+    scontrast:[{in:0,out:0},{in:64,out:28},{in:192,out:228},{in:255,out:255}],
+    lowcontrast:[{in:0,out:64},{in:255,out:191}],
+    liftShadows:[{in:0,out:70},{in:128,out:165},{in:255,out:255}],
+    crushBlacks:[{in:0,out:0},{in:96,out:24},{in:255,out:255}],
+    solarize:[{in:0,out:0},{in:128,out:255},{in:255,out:0}],
+    identity:[{in:0,out:0},{in:255,out:255}],
+  };
+
+  CATS = [
+    {id:'all',       label:'すべて'},
+    {id:'toneCurve', label:'トーンカーブ'},
+    {id:'kernel',    label:'カーネルフィルタ'},
+    {id:'threshold', label:'二値化・濃淡ヒストグラム'},
+    {id:'geometric', label:'幾何学的変換'},
+    {id:'fourier',   label:'フーリエ変換'},
+    {id:'frequency', label:'周波数フィルタ'},
+  ];
+
+  CATEN = { toneCurve:'TONE CURVE', kernel:'KERNEL FILTER', threshold:'THRESHOLD', geometric:'GEOMETRIC', frequency:'FREQUENCY', fourier:'FOURIER TRANSFORM' };
+
+  IMG_OPTS = [
+    {value:'momiji', label:'紅葉'},
+    {value:'bud',    label:'新芽'},
+    {value:'summer', label:'サマービーチ'},
+    {value:'pebbles', label:'小石'},
+    {value:'shapes', label:'図形'},
+    {value:'blue_kikagaku', label:'幾何学模様'},
+    {value:'metal', label:'金属(ヘアライン)'},
+    {value:'fence', label:'金網'},
+  ];
+
+  PRESETS = [
+    {label:'移動平均',     kernel:this.K.box,       scale:1/9,  scaleLabel:'1/9'},
+    {label:'ガウシアン',   kernel:this.K.gaussian,  scale:1/16, scaleLabel:'1/16'},
+    {label:'鮮鋭化',       kernel:this.K.sharpen,   scale:1,    scaleLabel:'1'},
+    {label:'エッジ強調',   kernel:this.K.edge,      scale:1,    scaleLabel:'1'},
+    {label:'ラプラシアン', kernel:this.K.laplacian, scale:1,    scaleLabel:'1'},
+    {label:'Sobel X',      kernel:this.K.sobelX,    scale:1,    scaleLabel:'1'},
+    {label:'Sobel Y',      kernel:this.K.sobelY,    scale:1,    scaleLabel:'1'},
+    {label:'恒等変換',     kernel:this.K.identity,  scale:1,    scaleLabel:'1'},
+  ];
+
+  QUIZZES = [
+    { id:'tc1', cat:'toneCurve', src:'momiji',
+      pre:'元画像の', hi:'Rチャンネルのみ', post:'を全体的に明るくした結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'r',   curvePoints:this.CV.brighten}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'g',   curvePoints:this.CV.brighten}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'b',   curvePoints:this.CV.brighten}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.brighten}},
+      ], answer:0,
+      explanation:'Rチャンネルのみを明るくすると画像全体が赤みがかって見えます。Gなら緑、Bなら青みが増し、rgb（全チャンネル）は色の偏りなく明度だけが増します。' },
+
+    { id:'tc2', cat:'toneCurve', src:'momiji',
+      pre:'全チャンネルに', hi:'ネガポジ反転', post:'を適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'r',   curvePoints:this.CV.invert}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'g',   curvePoints:this.CV.invert}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'b',   curvePoints:this.CV.invert}},
+      ], answer:0,
+      explanation:'全チャンネルに同じ反転を適用すると、色相は保たれたまま明暗だけが逆転したネガになります。単一チャンネルの反転は特定方向に色が偏ります。' },
+
+    { id:'tc3', cat:'toneCurve', src:'momiji',
+      pre:'', hi:'Bチャンネルのみ', post:'に反転カーブを適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'b',   curvePoints:this.CV.invert}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'r',   curvePoints:this.CV.invert}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'g',   curvePoints:this.CV.invert}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+      ], answer:0,
+      explanation:'Bチャンネルを反転すると白→黄、黒→青に転びます。補色の関係で「青を反転させると黄色みが現れる」という見た目になります。' },
+
+    { id:'k1', cat:'kernel', src:'shapes',
+      pre:'3×3の', hi:'平滑化（ぼかし）', post:'フィルタを適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.box,      scale:1/9}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.sharpen,  scale:1}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.sobelX,   scale:1}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.identity, scale:1}},
+      ], answer:0,
+      explanation:'移動平均（全要素1・×1/9）は近傍を平均し、ノイズや細部をぼかします。鮮鋭化やエッジ検出は逆に輪郭を強調します。' },
+
+    { id:'k2', cat:'kernel', src:'shapes',
+      pre:'', hi:'エッジ検出（ラプラシアン）', post:'の結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.laplacian, scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.box,       scale:1/9}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.sharpen,   scale:1}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.identity,  scale:1}},
+      ], answer:0,
+      explanation:'ラプラシアン（係数の合計0）は輝度の変化＝輪郭部分だけが現れ、平坦部はグレーになります。' },
+
+    { id:'k3', cat:'kernel', src:'shapes',
+      pre:'', hi:'鮮鋭化', post:'フィルタを適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.sharpen,   scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.box,       scale:1/9}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.laplacian, scale:1}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.identity,  scale:1}},
+      ], answer:0,
+      explanation:'鮮鋭化 [[0,-1,0],[-1,5,-1],[0,-1,0]] は中心を強め周囲を引くことで、輪郭のコントラストを高めはっきりさせます。' },
+
+    { id:'tc4', cat:'toneCurve', src:'summer',
+      pre:'画像全体を', hi:'暗く', post:'するトーンカーブの結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.darken}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.brighten}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.lowcontrast}},
+      ], answer:0,
+      explanation:'出力側を全体的に下げる右下がりのカーブは全画素を暗くします。明るくするカーブ・反転・低コントラスト化とは異なります。' },
+
+    { id:'tc5', cat:'toneCurve', src:'momiji',
+      pre:'', hi:'コントラストを高く', post:'するS字カーブを適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.scontrast}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.lowcontrast}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.brighten}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+      ], answer:0,
+      explanation:'暗部をより暗く・明部をより明るくするS字カーブはコントラストを高めます。ゆるい逆カーブは低コントラスト、全体持ち上げは明るさ増加です。' },
+
+    { id:'tc6', cat:'toneCurve', src:'summer',
+      pre:'', hi:'コントラストを低く', post:'する（眠い画像にする）結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.lowcontrast}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.scontrast}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.darken}},
+      ], answer:0,
+      explanation:'出力レンジを中央に圧縮するゆるいカーブは明暗差が減り、ねむい（低コントラストな）画像になります。' },
+
+    { id:'tc7', cat:'toneCurve', src:'bud',
+      pre:'新芽の画像全体に', hi:'シャドウ持ち上げ', post:'カーブ（黒を浮かせる）を適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.liftShadows}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.crushBlacks}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.scontrast}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.darken}},
+      ], answer:0,
+      explanation:'左端（黒）の出力を持ち上げるカーブは、最も暗い部分が灰色に浮き、コントラストの低いフィルムのような眠い質感になります。シャドウを締めるカーブ（黒が沈む）とは逆の効果です。' },
+
+    { id:'tc8', cat:'toneCurve', src:'bud',
+      pre:'新芽の画像の', hi:'Gチャンネルのみ', post:'を暗くした結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'g',   curvePoints:this.CV.darken}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'r',   curvePoints:this.CV.darken}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'b',   curvePoints:this.CV.darken}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.darken}},
+      ], answer:0,
+      explanation:'緑（G）チャンネルだけを暗くすると、緑の葉が沈んでマゼンタ（赤紫）寄りに転びます。補色の関係で「Gを下げると赤紫が残る」ためです。R・B単独や全チャンネルとは色の偏り方が異なります。' },
+
+    { id:'tc9', cat:'toneCurve', src:'pebbles',
+      pre:'小石の画像に', hi:'ソラリゼーション', post:'（山型カーブ）を適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.solarize}},
+        {label:'B', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.invert}},
+        {label:'C', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.scontrast}},
+        {label:'D', fn:'applyToneCurve', params:{channel:'rgb', curvePoints:this.CV.brighten}},
+      ], answer:0,
+      explanation:'中央まで上昇し、その後下降する山型カーブはソラリゼーション効果です。中間調が最も明るくなり、ハイライトが暗く反転するため独特の金属的な見た目になります。単純なネガ反転（右下がり直線）とは区別しましょう。' },
+
+    // ===== img -> curve : 処理結果からトーンカーブを当てる =====
+    { id:'ti1', cat:'toneCurve', tckind:'img2curve', src:'summer',
+      pre:'元画像に対し処理後の画像（右）が得られた。適用された', hi:'トーンカーブ', post:'はどれ？',
+      choices:[
+        {label:'A', kind:'curve', curvePoints:this.CV.scontrast},
+        {label:'B', kind:'curve', curvePoints:this.CV.lowcontrast},
+        {label:'C', kind:'curve', curvePoints:this.CV.brighten},
+        {label:'D', kind:'curve', curvePoints:this.CV.darken},
+      ], answer:0,
+      explanation:'処理後はメリハリが強く、暗部はより暗く・明部はより明るくなっています。これは入出力グラフが横たわったS字を描くカーブ＝高コントラスト化です。眠い画像（低コントラスト）や単純な明暗シフトとはグラフの形が異なります。' },
+
+    { id:'ti2', cat:'toneCurve', tckind:'img2curve', src:'momiji',
+      pre:'元画像に対し処理後の画像（右）が得られた。適用された', hi:'トーンカーブ', post:'はどれ？',
+      choices:[
+        {label:'A', kind:'curve', curvePoints:this.CV.liftShadows},
+        {label:'B', kind:'curve', curvePoints:this.CV.scontrast},
+        {label:'C', kind:'curve', curvePoints:this.CV.darken},
+        {label:'D', kind:'curve', curvePoints:this.CV.invert},
+      ], answer:0,
+      explanation:'処理後は最も暗い部分が黒ではなく灰色に浮き、全体が霞んだような低コントラストになっています。これはグラフ左端（入力0）の出力を持ち上げたカーブの特徴です。' },
+
+    { id:'ti3', cat:'toneCurve', tckind:'img2curve', src:'bud',
+      pre:'元画像に対し処理後の画像（右）が得られた。適用された', hi:'トーンカーブ', post:'はどれ？',
+      choices:[
+        {label:'A', kind:'curve', curvePoints:this.CV.invert},
+        {label:'B', kind:'curve', curvePoints:this.CV.solarize},
+        {label:'C', kind:'curve', curvePoints:this.CV.brighten},
+        {label:'D', kind:'curve', curvePoints:this.CV.crushBlacks},
+      ], answer:0,
+      explanation:'処理後は明暗が完全に逆転したネガ画像です。これは入力0→出力255、入力255→出力0の右下がりの対角直線（反転カーブ）。山型のソラリゼーションは中間調が明るく反転しますが全体のネガにはなりません。' },
+
+    { id:'ti4', cat:'toneCurve', tckind:'img2curve', src:'pebbles',
+      pre:'元画像に対し処理後の画像（右）が得られた。適用された', hi:'トーンカーブ', post:'はどれ？',
+      choices:[
+        {label:'A', kind:'curve', curvePoints:this.CV.brighten},
+        {label:'B', kind:'curve', curvePoints:this.CV.darken},
+        {label:'C', kind:'curve', curvePoints:this.CV.liftShadows},
+        {label:'D', kind:'curve', curvePoints:this.CV.scontrast},
+      ], answer:0,
+      explanation:'処理後は黒（入力0）と白（入力255）は保たれたまま、中間調だけがふっくら明るく持ち上がっています。これは原点と右上端を固定して上に膨らんだ凸カーブ＝明るく補正。シャドウ持ち上げ（黒も浮く）とは左端の挙動が違います。' },
+
+    { id:'ti5', cat:'toneCurve', tckind:'img2curve', src:'summer',
+      pre:'元画像に対し処理後の画像（右）が得られた。適用された', hi:'トーンカーブ', post:'はどれ？',
+      choices:[
+        {label:'A', kind:'curve', curvePoints:this.CV.lowcontrast},
+        {label:'B', kind:'curve', curvePoints:this.CV.scontrast},
+        {label:'C', kind:'curve', curvePoints:this.CV.crushBlacks},
+        {label:'D', kind:'curve', curvePoints:this.CV.brighten},
+      ], answer:0,
+      explanation:'処理後は明暗差が乏しく、白も黒も中間のグレーに寄った眠い画像です。これは出力レンジを中央へ圧縮したゆるい傾きのカーブ＝低コントラスト化。S字（高コントラスト）とは傾きの向きが逆です。' },
+
+    { id:'k4', cat:'kernel', src:'shapes',
+      pre:'', hi:'Sobel X（縦エッジ検出）', post:'の結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.sobelX,   scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.sobelY,   scale:1}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.box,      scale:1/9}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.identity, scale:1}},
+      ], answer:0,
+      explanation:'Sobel X は水平方向の輝度勾配を取るため、縦方向のエッジが強く現れます。Sobel Y は逆に横方向のエッジを検出します。' },
+
+    { id:'k5', cat:'kernel', src:'shapes',
+      pre:'', hi:'エンボス（浮き彫り）', post:'フィルタの結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.emboss,   scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.sharpen,  scale:1}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.box,      scale:1/9}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.identity, scale:1}},
+      ], answer:0,
+      explanation:'斜め方向で符号が反転するエンボスカーネルは、輪郭を立体的な陰影（浮き彫り）として表現します。' },
+
+    { id:'k6', cat:'kernel', src:'shapes',
+      pre:'', hi:'全方向の強い鮮鋭化', post:'（周囲8画素を引く）の結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.strongSharpen, scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.box,           scale:1/9}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.identity,      scale:1}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.laplacian,     scale:1}},
+      ], answer:0,
+      explanation:'中心9・周囲-1（合計1）のカーネルは縦横斜めすべての方向で輪郭を強調する、強い鮮鋭化フィルタです。' },
+
+    { id:'k7', cat:'kernel', src:'momiji',
+      pre:'適用しても', hi:'何も変化しない', post:'カーネル（恒等変換）はどれ？',
+      choices:[
+        {label:'A', fn:'applyKernel', params:{kernel:this.K.identity,  scale:1}},
+        {label:'B', fn:'applyKernel', params:{kernel:this.K.box,       scale:1/9}},
+        {label:'C', fn:'applyKernel', params:{kernel:this.K.sharpen,   scale:1}},
+        {label:'D', fn:'applyKernel', params:{kernel:this.K.laplacian, scale:1}},
+      ], answer:0,
+      explanation:'中心だけ1で他が0のカーネルは各画素をそのまま出力する恒等変換です。ぼかし・鮮鋭化・エッジ検出は見た目が変化します。' },
+
+    { id:'th6', cat:'threshold', thkind:'histmatch',
+      imgSrcs:['summer','momiji','pebbles'],
+      histSrcs:['momiji','pebbles','summer'],
+      answer:4,
+      pre:'図5〜図7のグレースケール画像の濃淡ヒストグラムは、図8〜図10のいずれかに対応している。画像とヒストグラムの正しい', hi:'組合せ', post:'はどれ？',
+      choices:[
+        {label:'ア', kind:'match', map:['図8','図9','図10'],  note:'図5（明るい砂浜）を図8に対応させているが、図8は暗部に山があり明るい画像には合わない。'},
+        {label:'イ', kind:'match', map:['図8','図10','図9'],  note:'図5を暗部寄りの図8に対応させており誤り。図5は明部に偏るはず。'},
+        {label:'ウ', kind:'match', map:['図9','図8','図10'],  note:'図5（明るい）を中庸な図9に当てており、明るさの偏りが合わない。'},
+        {label:'エ', kind:'match', map:['図9','図10','図8'],  note:'図7（中間調の小石）を暗部集中の図8に当てており不一致。'},
+        {label:'オ', kind:'match', map:['図10','図8','図9'],  note:'図5→図10（明部に偏る）、図6→図8（暗部に山）、図7→図9（中央に広く分布）。明るさの分布がすべて一致する。これが正解。'},
+        {label:'カ', kind:'match', map:['図10','図9','図8'],  note:'図5は図10で正しいが、図6と図7のヒストグラムが入れ替わっており誤り。'},
+      ],
+      explanation:'濃淡ヒストグラムは横軸が画素値（左=暗・右=明）、縦軸が頻度。画像全体が明るい図5（砂浜）は山が右（明部）に寄り＝図10。暗い部分が多い図6は山が左（暗部）に集中＝図8。中間調が広く分布する図7（小石）は中央付近になだらかな山＝図9。各画像の「どの明るさの画素が多いか」をヒストグラムの山の位置と見比べれば、組合せはオに決まる。' },
+
+    { id:'th5', cat:'threshold', thkind:'hist', src:'bud', marks:[70,115,160,205], answer:2,
+      pre:'図〈1〉のグレースケール画像を、ある', hi:'しきい値', post:'で2値化して図〈2〉を得た。図3のヒストグラム上の①〜④のうち、図〈2〉が得られたしきい値はどれ？',
+      choices:[
+        {label:'ア', kind:'thresh', mark:0, note:'しきい値が低すぎる。暗い部分まで白側に含まれ、図〈2〉より白い領域がはるかに多くなる。'},
+        {label:'イ', kind:'thresh', mark:1, note:'まだ低い。中間の明るさの部分も白くなり、図〈2〉より白が多い。'},
+        {label:'ウ', kind:'thresh', mark:2, note:'明るい部分だけが白く残り、暗い部分は黒になる。白い画素の割合が図〈2〉と一致する。これが正解。'},
+        {label:'エ', kind:'thresh', mark:3, note:'しきい値が高すぎる。最も明るい部分しか白く残らず、ほぼ全体が黒になってしまう。'},
+      ],
+      explanation:'2値化は「しきい値 t 以上の明るい画素を白、未満を黒」にする処理。つまり白い画素の割合は、ヒストグラムで t より右（明るい側）の面積に等しい。図〈2〉の白い領域の割合と一致する右側面積になる③が正解。①②は t が低く白が多すぎ、④は t が高すぎてほぼ黒になる。しきい値はヒストグラムのどこで明暗を分けるかを表す。' },
+
+    { id:'th7', cat:'threshold', thkind:'hist', src:'summer', marks:[80,130,180,220], answer:1,
+      pre:'図〈1〉のグレースケール画像（サマービーチ）を、ある', hi:'しきい値', post:'で2値化して図〈2〉を得た。図3のヒストグラム上の①〜④のうち、図〈2〉が得られたしきい値はどれ？',
+      choices:[
+        {label:'ア', kind:'thresh', mark:0, note:'しきい値が低すぎる。空や砂浜だけでなく暗い部分まで白くなり、図〈2〉よりほぼ全面が白くなる。'},
+        {label:'イ', kind:'thresh', mark:1, note:'明るい空・砂浜が白、暗い部分が黒に分かれる。白い画素の割合が図〈2〉と一致する。これが正解。'},
+        {label:'ウ', kind:'thresh', mark:2, note:'やや高い。最も明るい部分しか白く残らず、図〈2〉より白が少なくなる。'},
+        {label:'エ', kind:'thresh', mark:3, note:'しきい値が高すぎる。ハイライト部分のみ白で、ほぼ全体が黒になってしまう。'},
+      ],
+      explanation:'2値化は「しきい値 t 以上の明るい画素を白、未満を黒」にする処理。白い画素の割合は、ヒストグラムで t より右（明るい側）の面積に等しい。明るい画像なので山は右寄りだが、図〈2〉の白領域の割合に合う面積を切り出す②が正解。①は低すぎて白が多すぎ、③④は高すぎて白が少なくなる。' },
+
+    { id:'th8', cat:'threshold', thkind:'hist', src:'momiji', marks:[55,95,140,190], answer:2,
+      pre:'図〈1〉のグレースケール画像（紅葉）を、ある', hi:'しきい値', post:'で2値化して図〈2〉を得た。図3のヒストグラム上の①〜④のうち、図〈2〉が得られたしきい値はどれ？',
+      choices:[
+        {label:'ア', kind:'thresh', mark:0, note:'しきい値が低すぎる。暗い背景まで白側に含まれ、図〈2〉より白い領域がはるかに多くなる。'},
+        {label:'イ', kind:'thresh', mark:1, note:'まだ低い。中間調の葉も白くなり、図〈2〉より白が多い。'},
+        {label:'ウ', kind:'thresh', mark:2, note:'明るい葉だけが白く残り、暗い背景は黒になる。白い画素の割合が図〈2〉と一致する。これが正解。'},
+        {label:'エ', kind:'thresh', mark:3, note:'しきい値が高すぎる。最も明るい部分しか白く残らず、ほぼ全体が黒になってしまう。'},
+      ],
+      explanation:'2値化は「しきい値 t 以上の明るい画素を白、未満を黒」にする処理。白い画素の割合は、ヒストグラムで t より右（明るい側）の面積に等しい。暗い背景が多い紅葉では山は左寄りで、図〈2〉の白領域に合う面積を切り出す③が正解。①②は t が低く白が多すぎ、④は高すぎてほぼ黒になる。' },
+
+
+    { id:'fq1', cat:'frequency', src:'momiji',
+      pre:'周波数領域で', hi:'ローパスフィルタ（低周波のみ通過）', post:'を適用した結果はどれ？（フィルタは右図／白=1・黒=0）',
+      choices:[
+        {label:'A', fn:'applyFrequency', params:{type:'lowpass',  sigma:16}},
+        {label:'B', fn:'applyFrequency', params:{type:'highpass', sigma:14, gain:1.4}},
+        {label:'C', fn:'applyFrequency', params:{type:'directional', angle:45, width:5}},
+        {label:'D', fn:'applyFrequency', params:{type:'lowpass',  sigma:95}},
+      ], answer:0,
+      explanation:'ローパスフィルタは中心付近（低周波）だけを残すため、細かい変化（高周波）が失われ画像全体がぼけます。ハイパスは輪郭、方向性フィルタは特定方向の流れ、通過範囲を広げると元画像に近づきます。' },
+
+    { id:'fq2', cat:'frequency', src:'momiji',
+      pre:'周波数領域で', hi:'ハイパスフィルタ（高周波のみ通過）', post:'を適用した結果はどれ？（フィルタは右図／白=1・黒=0）',
+      choices:[
+        {label:'A', fn:'applyFrequency', params:{type:'highpass', sigma:14, gain:1.4}},
+        {label:'B', fn:'applyFrequency', params:{type:'lowpass',  sigma:16}},
+        {label:'C', fn:'applyFrequency', params:{type:'directional', angle:45, width:5}},
+        {label:'D', fn:'applyFrequency', params:{type:'bandpass', center:38, sigma:10, gain:1.6}},
+      ], answer:0,
+      explanation:'ハイパスフィルタは中心（低周波・平坦な部分）を除き高周波だけを残すため、輪郭（エッジ）が灰色背景に浮かび上がります。ローパスはぼかし、バンドパスは中間周波数を残します。' },
+
+    { id:'fq3', cat:'frequency', src:'momiji',
+      pre:'周波数領域で右図のような', hi:'原点を通る直線状フィルタ（45°方向）', post:'を適用した結果はどれ？',
+      choices:[
+        {label:'A', fn:'applyFrequency', params:{type:'directional', angle:45,  width:5}},
+        {label:'B', fn:'applyFrequency', params:{type:'directional', angle:0,   width:5}},
+        {label:'C', fn:'applyFrequency', params:{type:'directional', angle:90,  width:5}},
+        {label:'D', fn:'applyFrequency', params:{type:'directional', angle:135, width:5}},
+      ], answer:0,
+      explanation:'原点を通る直線状フィルタは、その向きの周波数成分だけを残します。結果として線と直交する方向に画像がぼけて流れ、フィルタの向きが変わると流れる方向も変わります。' },
+
+    { id:'fq4', cat:'frequency', src:'momiji',
+      pre:'周波数領域で', hi:'バンドパスフィルタ（中間周波数のみ通過）', post:'を適用した結果はどれ？（右図のリング状）',
+      choices:[
+        {label:'A', fn:'applyFrequency', params:{type:'bandpass', center:38, sigma:10, gain:1.6}},
+        {label:'B', fn:'applyFrequency', params:{type:'lowpass',  sigma:16}},
+        {label:'C', fn:'applyFrequency', params:{type:'highpass', sigma:14, gain:1.4}},
+        {label:'D', fn:'applyFrequency', params:{type:'directional', angle:45, width:5}},
+      ], answer:0,
+      explanation:'バンドパス（リング状）フィルタは中間の周波数だけを残すため、特定の細かさの模様・輪郭が強調されます。ローパスはぼかし、ハイパスは細い輪郭、方向性は特定方向のみを残します。' },
+
+    { id:'ft1', cat:'fourier', srcPattern:'vstripe',
+      pre:'左の', hi:'縦縞パターン', post:'をフーリエ変換し、振幅スペクトルを中心化（低周波が中央）で表したものはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'vstripe'},
+        {label:'B', fn:'fourier', pattern:'hstripe'},
+        {label:'C', fn:'fourier', pattern:'dstripe'},
+        {label:'D', fn:'fourier', pattern:'d135'},
+      ], answer:0,
+      explanation:'縦縞は「横方向に明暗が変化する」単一周波数の波です。そのため振幅スペクトルは中心の左右に1対の輝点として現れます。縞の向き（縦）とスペクトルの輝点が並ぶ向き（横）は必ず直交します。' },
+
+    { id:'ft2', cat:'fourier', srcPattern:'hstripe',
+      pre:'左の', hi:'横縞パターン', post:'のフーリエ振幅スペクトル（中心化）はどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'vstripe'},
+        {label:'B', fn:'fourier', pattern:'hstripe'},
+        {label:'C', fn:'fourier', pattern:'dstripe'},
+        {label:'D', fn:'fourier', pattern:'d135'},
+      ], answer:1,
+      explanation:'横縞は「縦方向に明暗が変化する」波なので、スペクトルは中心の上下に1対の輝点になります。縦縞（左右の点）とちょうど90°違うことに注目しましょう。' },
+
+    { id:'ft3', cat:'fourier', srcPattern:'dstripe',
+      pre:'左の', hi:'45°の斜め縞', post:'のフーリエ振幅スペクトル（中心化）はどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'d135'},
+        {label:'B', fn:'fourier', pattern:'dstripe'},
+        {label:'C', fn:'fourier', pattern:'hstripe'},
+        {label:'D', fn:'fourier', pattern:'vstripe'},
+      ], answer:1,
+      explanation:'縞が斜め（45°）に傾くと、スペクトルの1対の輝点も同じだけ傾いて対角線上に並びます。縞の傾きとスペクトルの傾きは連動します。' },
+
+    { id:'ft4', cat:'fourier', srcPattern:'checker',
+      pre:'左の', hi:'市松模様（斜め格子）', post:'のフーリエ振幅スペクトルはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'cross'},
+        {label:'B', fn:'fourier', pattern:'dstripe'},
+        {label:'C', fn:'fourier', pattern:'checker'},
+        {label:'D', fn:'fourier', pattern:'d135'},
+      ], answer:2,
+      explanation:'市松模様は cos(x)×cos(y) の積で、斜め2方向の波が掛け合わさっています。そのためスペクトルは中心の周りに「×」字状の4つの輝点として現れます。' },
+
+    { id:'ft5', cat:'fourier', srcPattern:'cross',
+      pre:'左の', hi:'縦横の格子（縦縞＋横縞）', post:'のフーリエ振幅スペクトルはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'checker'},
+        {label:'B', fn:'fourier', pattern:'dstripe'},
+        {label:'C', fn:'fourier', pattern:'hstripe'},
+        {label:'D', fn:'fourier', pattern:'cross'},
+      ], answer:3,
+      explanation:'縦縞と横縞を足し合わせた格子は、横方向の波と縦方向の波を両方持ちます。スペクトルは中心の上下左右に「＋」字状の4つの輝点になります（市松模様の「×」と区別！）。' },
+
+    { id:'ft6', cat:'fourier', srcPattern:'concentric',
+      pre:'左の', hi:'同心円（一定間隔のリング）', post:'のフーリエ振幅スペクトルはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'concentric'},
+        {label:'B', fn:'fourier', pattern:'hex'},
+        {label:'C', fn:'fourier', pattern:'pebbles'},
+        {label:'D', fn:'fourier', pattern:'fence'},
+      ], answer:0,
+      explanation:'一定間隔の同心円はあらゆる方向に同じ周波数の波を含むため、スペクトルは中心から一定半径の「リング（円環）」状になります。方向に依存しない＝等方的なパターンの特徴です。' },
+
+    { id:'ft7', cat:'fourier', srcPattern:'hex', src:'blue_kikagaku',
+      pre:'左の', hi:'六角形の周期パターン（実画像）', post:'のフーリエ振幅スペクトルはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'metal'},
+        {label:'B', fn:'fourier', pattern:'fence'},
+        {label:'C', fn:'fourier', pattern:'shapes'},
+        {label:'D', fn:'fourier', pattern:'hex'},
+      ], answer:3,
+      explanation:'規則正しく繰り返す六角形パターンは、繰り返し周期に対応した離散的な輝点の集まりになります。六方格子の対称性を反映して、輝点も六角形状（六方配置）に並びます。周期構造ほどスペクトルは点状にはっきり現れます。' },
+
+    { id:'ft8', cat:'fourier', srcPattern:'metal', src:'metal',
+      pre:'左の', hi:'金属のヘアライン仕上げ（一方向にそろった細い筋）', post:'のフーリエ振幅スペクトル（中心化）はどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'metal'},
+        {label:'B', fn:'fourier', pattern:'fence'},
+        {label:'C', fn:'fourier', pattern:'shapes'},
+        {label:'D', fn:'fourier', pattern:'hex'},
+      ], answer:0,
+      explanation:'ヘアライン（ブラシ目）はすべて同じ向きにそろった無数の細い筋です。向きがそろった異方的な模様なので、スペクトルのエネルギーは中心を通る一本の明るい筋（直線状）に集中します。その筋の傾きはヘアラインの向きと直交します。斜め2方向に広がる金網の「×字」、規則的な点が並ぶ六角格子、図形のエッジが作る十字状の構造とは異なり、たった一方向の連続した筋になるのがヘアラインの特徴です。' },
+
+    { id:'ft9', cat:'fourier', srcPattern:'fence', src:'fence',
+      pre:'左の', hi:'金網（菱形の周期メッシュ）', post:'のフーリエ振幅スペクトルはどれ？',
+      choices:[
+        {label:'A', fn:'fourier', pattern:'hex'},
+        {label:'B', fn:'fourier', pattern:'fence'},
+        {label:'C', fn:'fourier', pattern:'shapes'},
+        {label:'D', fn:'fourier', pattern:'metal'},
+      ], answer:1,
+      explanation:'金網は菱形が規則正しく繰り返す周期パターンなので、スペクトルは網目の2つの斜め方向に沿ってエネルギーが伸び、中心から斜めに広がる「×字状」の構造になります。六方配置の点群（六角格子）や、一方向だけに伸びる筋（ヘアライン）、図形のエッジ由来の十字状の構造とは異なり、斜め2方向そろって成分が現れるのが菱形メッシュの特徴です。' },
+
+    // ===== geometric transforms — coordinate-plane / matrix / equation style =====
+    { id:'gm1', cat:'geometric', gkind:'mat2fig', src:'bud', region:{x0:1,y0:1,x1:5,y1:4}, R:7,
+      pre:'図の原画像を，右の', hi:'2×2行列（式①）', post:'で原点中心に線形変換した結果はどれ？',
+      choices:[
+        {label:'A', kind:'fig', matrix:[[0.70711,-0.70711],[0.70711,0.70711]], disp:[['√2/2','−√2/2'],['√2/2','√2/2']], note:'原点を中心に45°（反時計回り）回転。これが式①。'},
+        {label:'B', kind:'fig', matrix:[[0.70711,0.70711],[-0.70711,0.70711]], disp:[['√2/2','√2/2'],['−√2/2','√2/2']], note:'45°時計回りの回転。回転の向きが逆。'},
+        {label:'C', kind:'fig', rotCenterDeg:30, note:'画像の中心を軸に反時計回り30°回転。原点中心ではないため図形の位置がほぼ動かず、角度も45°ではない。'},
+        {label:'D', kind:'fig', rotCenterDeg:-30, note:'画像の中心を軸に時計回り30°回転。中心が固定で原点回転と異なり、回転の向き・角度も誤り。'},
+      ], answer:0,
+      explanation:'式①の行列は (cosθ −sinθ / sinθ cosθ) の形で θ=45°。原点を中心に反時計回りへ45°回転します。第1象限にあった図形が y 軸寄りへ回り込みます。原点中心の回転は図形全体が原点のまわりを公転するように動くのに対し、画像の中心を軸にした回転（C・D）は位置がほとんど変わらない点で見分けられます。' },
+
+    { id:'gm2', cat:'geometric', gkind:'mat2fig', src:'bud', region:{x0:1,y0:1,x1:5,y1:4}, R:8,
+      pre:'図の原画像を，右の', hi:'2×2行列（式①）', post:'で線形変換した結果はどれ？',
+      choices:[
+        {label:'A', kind:'fig', matrix:[[1,0.7],[0,1]], disp:[['1','0.7'],['0','1']], note:'横方向のスキュー（せん断）。y に比例して横へずれ平行四辺形になる。'},
+        {label:'B', kind:'fig', matrix:[[1,0],[0.7,1]], note:'縦方向のスキュー。x に比例して縦へずれる。'},
+        {label:'C', kind:'fig', matrix:[[1.6,0],[0,1]], note:'横方向に拡大（長方形のまま、傾かない）。'},
+        {label:'D', kind:'fig', matrix:[[0.866,-0.5],[0.5,0.866]], note:'30°回転（形は変わらず向きが変わる）。'},
+      ], answer:0,
+      explanation:'非対角成分だけが入った (1 b / 0 1) はスキュー（せん断）変換です。各点は y 座標に比例して横方向へずれ、長方形が平行四辺形に変形します。対角の拡大・縮小や回転とは区別しましょう。' },
+
+    { id:'gm3', cat:'geometric', gkind:'mat2fig', src:'bud', region:{x0:1,y0:1,x1:5,y1:4}, R:6,
+      pre:'図の原画像を，右の', hi:'2×2行列（式①）', post:'で線形変換した結果はどれ？',
+      choices:[
+        {label:'A', kind:'fig', matrix:[[-1,0],[0,1]], disp:[['−1','0'],['0','1']], note:'y 軸に関する鏡映（左右反転）。x 座標の符号が反転し第2象限へ。'},
+        {label:'B', kind:'fig', matrix:[[1,0],[0,-1]], note:'x 軸に関する鏡映（上下反転）。'},
+        {label:'C', kind:'fig', matrix:[[-1,0],[0,-1]], note:'原点中心に180°回転（点対称）。'},
+        {label:'D', kind:'fig', matrix:[[1,0],[0,1]], note:'恒等変換（何も変えない）。'},
+      ], answer:0,
+      explanation:'(−1 0 / 0 1) は x 座標だけ符号を反転するので、y 軸を鏡として左右反転します。x 軸鏡映 (1 0 / 0 −1)、180°回転 (−1 0 / 0 −1) との符号の違いを読み取れるかがポイントです。' },
+
+    { id:'ge1', cat:'geometric', gkind:'fig2eq', R:5, transform:{A:0,B:1,C:-1,D:0,E:0,F:0},
+      pre:'図形を，図形′（赤）に変換した。この', hi:'座標変換式', post:'はどれ？',
+      choices:[
+        {label:'ア', kind:'eq', eq:{A:0,B:1,C:-1,D:0,E:0,F:0}, note:'(x,y)→(y,−x)。原点中心に時計回り90°回転。これが正解。'},
+        {label:'イ', kind:'eq', eq:{A:0,B:1,C:1,D:0,E:0,F:0}, note:'(x,y)→(y,x)。直線 y=x に関する鏡映。'},
+        {label:'ウ', kind:'eq', eq:{A:1,B:0,C:0,D:-1,E:0,F:0}, note:'(x,y)→(x,−y)。x 軸に関する鏡映（上下反転）。'},
+        {label:'エ', kind:'eq', eq:{A:0,B:-1,C:1,D:0,E:0,F:0}, note:'(x,y)→(−y,x)。反時計回り90°回転（向きが逆）。'},
+      ], answer:0,
+      explanation:'第1象限の図形が、向きを保ったまま第4象限へ回り込んでいます。これは原点を中心とした時計回り90°回転で、座標変換式は x′=y, y′=−x。鏡映（ウ・イ）では図形が裏返るので区別できます。' },
+
+    { id:'ge2', cat:'geometric', gkind:'fig2eq', R:9, transform:{A:2,B:0,C:0,D:1,E:0,F:0},
+      pre:'図形を，図形′（赤）に変換した。この', hi:'座標変換式', post:'はどれ？',
+      choices:[
+        {label:'ア', kind:'eq', eq:{A:2,B:0,C:0,D:1,E:0,F:0}, note:'x′=2x, y′=y。横方向だけ2倍に拡大。これが正解。'},
+        {label:'イ', kind:'eq', eq:{A:1,B:0,C:0,D:2,E:0,F:0}, note:'x′=x, y′=2y。縦方向だけ2倍。'},
+        {label:'ウ', kind:'eq', eq:{A:2,B:0,C:0,D:2,E:0,F:0}, note:'x′=2x, y′=2y。縦横とも2倍（相似拡大）。'},
+        {label:'エ', kind:'eq', eq:{A:1,B:0,C:0,D:1,E:2,F:0}, note:'x′=x+2, y′=y。形を変えず右へ平行移動。'},
+      ], answer:0,
+      explanation:'変換後は横幅だけが2倍に伸び、縦の高さは変わっていません。したがって x′=2x, y′=y。係数が x・y のどちらに掛かるかで拡大方向が決まり、定数項（エ）は平行移動を表します。' },
+
+    { id:'gx1', cat:'geometric', gkind:'fig2mat', R:7, matrix:[[1,1],[0,1]],
+      pre:'図形を，図形′（赤）に変換した。この変換を表す', hi:'2×2行列', post:'はどれ？',
+      choices:[
+        {label:'ア', kind:'mat', disp:[['1','1'],['0','1']], note:'x′=x+y, y′=y。横方向のせん断（スキュー）。これが正解。'},
+        {label:'イ', kind:'mat', disp:[['1','0'],['1','1']], note:'x′=x, y′=x+y。縦方向のせん断。'},
+        {label:'ウ', kind:'mat', disp:[['2','0'],['0','1']], note:'x′=2x。横方向に2倍拡大（平行四辺形にはならない）。'},
+        {label:'エ', kind:'mat', disp:[['0','1'],['1','0']], note:'x と y を入れ替え＝直線 y=x に関する鏡映。'},
+      ], answer:0,
+      explanation:'長方形が平行四辺形へ傾き、上の辺ほど右へずれています。これは y 座標に比例して x をずらすせん断で、行列は (1 1 / 0 1)。1行目の非対角成分が横スキュー量を表します。' },
+
+    { id:'ga1', cat:'geometric', gkind:'affine', src:'bud', region:{x0:1,y0:1,x1:5,y1:4}, deg:30, R:7, choiceLayout:'wide',
+      pre:'図の画像を，中心位置を変えずに', hi:'時計まわりに30°回転', post:'した。原点まわりの回転と平行移動で表すと、この合成変換はどれ？',
+      choices:[
+        {label:'ア', kind:'mprod', mats:[[['1','0','3'],['0','1','5/2'],['0','0','1']],[['√3/2','1/2','0'],['−1/2','√3/2','0'],['0','0','1']],[['1','0','−3'],['0','1','−5/2'],['0','0','1']]], note:'中心を原点へ移動 → 時計回り30°回転 → 元へ戻す。順序・向きとも正しい。'},
+        {label:'イ', kind:'mprod', mats:[[['1','0','−3'],['0','1','−5/2'],['0','0','1']],[['√3/2','1/2','0'],['−1/2','√3/2','0'],['0','0','1']],[['1','0','3'],['0','1','5/2'],['0','0','1']]], note:'平行移動の符号が逆。中心が原点に戻らずズレる。'},
+        {label:'ウ', kind:'mprod', mats:[[['1','0','3'],['0','1','5/2'],['0','0','1']],[['√3/2','−1/2','0'],['1/2','√3/2','0'],['0','0','1']],[['1','0','−3'],['0','1','−5/2'],['0','0','1']]], note:'回転行列が反時計回り。向きが逆。'},
+        {label:'エ', kind:'mprod', mats:[[['√3/2','1/2','0'],['−1/2','√3/2','0'],['0','0','1']]], note:'原点中心の回転のみ。中心を戻していないので位置がずれる。'},
+      ], answer:0,
+      explanation:'「中心を原点へ平行移動 T(−c) → 原点まわりに回転 R → 元の位置へ戻す T(+c)」の3段階。列ベクトルへは右から順に作用するので合成は T(+c)·R·T(−c) の順。平行移動の符号や回転の向き、順序のどれを誤っても中心がずれたり逆回転になります。' },
+
+    { id:'gc1', cat:'geometric', gkind:'compose3', src:'bud', region:{x0:0,y0:1,x1:4,y1:4}, R:6,
+      stages:[
+        { label:'〈1〉原画像', aff:{A:1,B:0,C:0,D:1,E:0,F:0} },
+        { label:'〈2〉左上を原点へ移動し60°回転', aff:{A:0.5,B:-0.8660254,C:0.8660254,D:0.5,E:3.4641016,F:-2}, arrowLabel:'平行移動＋60°回転' },
+      ],
+      pre:'〈1〉の画像の左上 (0,4) を座標原点まで平行移動し、反時計回りに60°回転して〈2〉を得た。この', hi:'合成変換の変換行列', post:'はどれ？',
+      choices:[
+        {label:'ア', kind:'mat', disp:[['1/2','−√3/2','0'],['√3/2','1/2','−4'],['0','0','1']], note:'平行移動列が (0,−4) のまま。T·R（回転を先に行い後で平行移動）の順で、順序が逆。'},
+        {label:'イ', kind:'mat', disp:[['1/2','−√3/2','−2√3'],['√3/2','1/2','2'],['0','0','1']], note:'平行移動の向きが逆。左上を原点へ下げる移動 (0,−4) ではなく、上向き (0,4) で計算している。'},
+        {label:'ウ', kind:'mat', disp:[['1/2','−√3/2','2√3'],['√3/2','1/2','−2'],['0','0','1']], note:'M=R(60°)·T(0,−4)。平行移動列は R·(0,−4)=(2√3, −2)。これが正解。'},
+        {label:'エ', kind:'mat', disp:[['1/2','−√3/2','0'],['√3/2','1/2','0'],['2√3','−2','1']], note:'平行移動成分を最下行（行ベクトル規約の位置）に置いた誤り。列ベクトルでは第3列に入る。'},
+        {label:'オ', kind:'mat', disp:[['1/2','−√3/2','−2√3'],['√3/2','1/2','2'],['2√3','−2','1']], note:'平行移動の位置・符号がともに誤り。'},
+      ], answer:2,
+      explanation:'まず左上 (0,4) を座標原点へ移す平行移動 T=(0,−4)、次に原点まわりに反時計回り60°回転 R を施す。列ベクトル x に対し x′=R(T x)=(R·T)x なので、合成は M=R·T（R が左）。回転 R=(1/2 −√3/2 / √3/2 1/2)、平行移動列は R·(0,−4)=(2√3, −2) となる。順序を逆（T·R）にすると平行移動が回転の影響を受けず (0,−4) のまま残り、誤った行列（ア）になる。' },
+
+    { id:'gc2', cat:'geometric', gkind:'fig2mprod', src:'bud', region:{x0:0.5,y0:0.5,x1:2.5,y1:2.5}, R:4, choiceLayout:'wide',
+      aff:{A:-0.70711,B:-0.70711,C:-0.70711,D:0.70711,E:0.70711,F:0},
+      pre:'図の原画像（青）を，画像′（赤）へ変換した。鏡映 → 回転 → 平行移動の順に施したこの変換を，平行移動 A・回転 B・鏡映 C の積', hi:'③ ～ ABC', post:'で表すと正しいのはどれ？',
+      choices:[
+        {label:'ア', kind:'mprod', mats:[[['1','0','√2/2'],['0','1','0'],['0','0','1']],[['√2/2','−√2/2','0'],['√2/2','√2/2','0'],['0','0','1']],[['−1','0','0'],['0','1','0'],['0','0','1']]], note:'A＝x方向に √2/2 の平行移動，B＝反時計回り45°回転，C＝y軸に関する鏡映。順序・向き・鏡映軸すべて正しい。これが式③。'},
+        {label:'イ', kind:'mprod', mats:[[['1','0','√2/2'],['0','1','0'],['0','0','1']],[['√2/2','√2/2','0'],['−√2/2','√2/2','0'],['0','0','1']],[['−1','0','0'],['0','1','0'],['0','0','1']]], note:'B が時計回り45°回転（sin の符号が逆）。回転の向きが誤り。'},
+        {label:'ウ', kind:'mprod', mats:[[['1','0','√2/2'],['0','1','0'],['0','0','1']],[['√2/2','−√2/2','0'],['√2/2','√2/2','0'],['0','0','1']],[['1','0','0'],['0','−1','0'],['0','0','1']]], note:'C が x 軸に関する鏡映（上下反転）。鏡映の軸が誤り。'},
+        {label:'エ', kind:'mprod', mats:[[['−1','0','0'],['0','1','0'],['0','0','1']],[['√2/2','−√2/2','0'],['√2/2','√2/2','0'],['0','0','1']],[['1','0','√2/2'],['0','1','0'],['0','0','1']]], note:'積の順序を C·B·A と逆に並べた誤り。平行移動が先に作用してしまい結果がずれる。'},
+      ], answer:0,
+      explanation:'問7の逆パターン。図形がどう動いたか（y軸で左右反転 → 反時計回り45°回転 → x方向へ平行移動）を読み取り、対応する行列の積を選びます。列ベクトルへは右から順に作用するので、最初に施す鏡映 C を一番右、最後の平行移動 A を一番左に置いた A·B·C＝③ が正解。回転の向き（イ）、鏡映の軸（ウ）、積の順序（エ）のいずれを誤っても変換後の図形は一致しません。' },
+  ];
+
+  state = {
+    screen:'start',
+    selectedCategory:'all',
+    session:[],
+    index:0,
+    selected:null,
+    score:0,
+    pgImage:'momiji',
+    pgKernel:[[0,-1,0],[-1,5,-1],[0,-1,0]],
+    pgScale:1,
+    pgScaleInput:'1',
+    fpImage:'black',
+    fpBrush:'white',
+    fpBrushSize:8,
+    fpBrushShape:'circle',
+    fpVer:0,
+    thImage:'momiji',
+    thValue:128,
+    thInvert:false,
+    tcImage:'momiji',
+    tcChannel:'rgb',
+    tcPoints:[{in:0,out:0},{in:64,out:64},{in:128,out:128},{in:192,out:192},{in:255,out:255}],
+    tcSmooth:false,
+    gpImage:'bud',
+    gpMatR:[[1,0,0],[0,1,0],[0,0,1]],
+    gpMatM:[[1,0,0],[0,1,0],[0,0,1]],
+    gpRotR:0, gpScaleR:1, gpTxR:0, gpTyR:0,
+    gpRotM:0, gpScaleM:1, gpTxM:0, gpTyM:0,
+  };
+
+  fpN = 128;
+  fpRe = null;
+  fpIm = null;
+  fpLoadedKey = null;
+  fpWhite = 90 * 128 * 128;
+  fpBoundEl = null;
+
+  componentDidMount() {
+    const keys = this.IMG_OPTS.map(o => o.value);
+    keys.forEach(k => {
+      const im = new Image();
+      im.onload = () => { this.imgs[k] = im; this.forceUpdate(); };
+      im.src = 'public/images/' + k + '.jpg';
+    });
+    this.drawAll();
+  }
+  componentDidUpdate() { this.drawAll(); }
+
+  // ---------- drawing ----------
+  drawAll() {
+    const s = this.state.screen;
+    if (s === 'quiz') this.drawQuiz();
+    else if (s === 'playground') this.drawPlayground();
+    else if (s === 'fourier') this.drawFourierPlayground();
+    else if (s === 'threshold') this.drawThreshold();
+    else if (s === 'tonepg') this.drawTonePG();
+    else if (s === 'geopg') this.drawGeoPG();
+  }
+  putToCanvas(id, img) {
+    if (!img) return;
+    const c = document.getElementById(id);
+    if (!c) return;
+    if (c.width !== img.width) c.width = img.width;
+    if (c.height !== img.height) c.height = img.height;
+    c.getContext('2d').putImageData(img, 0, 0);
+  }
+  drawQuiz() {
+    const q = this.state.session[this.state.index];
+    if (!q) return;
+    if (q.cat === 'frequency') { this.drawFrequency(q); return; }
+    if (q.cat === 'fourier') { this.drawFourier(q); return; }
+    if (q.cat === 'geometric') { this.drawGeometric(q); return; }
+    if (q.cat === 'toneCurve' && q.tckind === 'img2curve') { this.drawToneId(q); return; }
+    if (q.cat === 'threshold' && q.thkind === 'hist') { this.drawHistThresh(q); return; }
+    if (q.cat === 'threshold' && q.thkind === 'histmatch') { this.drawHistMatch(q); return; }
+    const base = this.getSource(q.src, 512, 300);
+    if (!base) return;
+    this.putToCanvas('q-source', base);
+    q.choices.forEach((ch, i) => { this.putToCanvas('q-choice-' + i, this.process(base, ch)); });
+  }
+  drawPlayground() {
+    const src = this.getSource(this.state.pgImage, 424, 424);
+    if (!src) return;
+    this.putToCanvas('pg-source', src);
+    this.putToCanvas('pg-result', this.applyKernel(src, this.state.pgKernel, this.state.pgScale));
+  }
+
+  // ---------- threshold playground (live binarization + draggable histogram) ----------
+  drawThreshold() {
+    const base = this.getSource(this.state.thImage, 236, 184);
+    if (!base) return;
+    const gd = new Uint8ClampedArray(base.data);
+    for (let i = 0; i < gd.length; i += 4) { const g = Math.round(0.299*gd[i]+0.587*gd[i+1]+0.114*gd[i+2]); gd[i]=gd[i+1]=gd[i+2]=g; }
+    this.putToCanvas('th-source', new ImageData(gd, base.width, base.height));
+    this.putToCanvas('th-result', this.applyThreshold(base, { threshold: this.state.thValue, invert: this.state.thInvert }));
+    this.drawThreshHist('th-hist', base, this.state.thValue, this.state.thInvert);
+  }
+  drawThreshHist(id, src, t, invert) {
+    const c = document.getElementById(id); if (!c) return;
+    const cw = c.clientWidth || 480, chh = c.clientHeight || 206;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(cw*dpr); c.height = Math.round(chh*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+    const W = c.width, H = c.height;
+    const padL = 30*dpr, padR = 14*dpr, padT = 18*dpr;
+    const barH = 13*dpr, gap = 4*dpr, labelH = 18*dpr;
+    const plotBottom = H - labelH - gap - barH - gap - 16*dpr;
+    const plotTop = padT;
+    const plotW = W - padL - padR;
+    const x = v => padL + (v/255)*plotW;
+    this.thGeom = { padLcss: padL/dpr, plotWcss: plotW/dpr };
+    const tC = Math.max(0, Math.min(255, Math.round(t)));
+    // histogram counts (smoothed)
+    const d = src.data, hist = new Array(256).fill(0);
+    for (let i=0;i<d.length;i+=4){ const g=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]); hist[g]++; }
+    const sm = new Array(256).fill(0);
+    for (let v=0;v<256;v++){ let s=0,n=0; for(let k=-2;k<=2;k++){const j=v+k; if(j>=0&&j<256){s+=hist[j];n++;}} sm[v]=s/n; }
+    const maxV = Math.max(...sm) || 1;
+    const yOf = v => plotBottom - (sm[v]/maxV)*(plotBottom-plotTop);
+    const whiteCol = '#f4d8cb', blackCol = '#d9d7d0';
+    const fillArea = (v0, v1, color) => {
+      ctx.beginPath(); ctx.moveTo(x(v0), plotBottom);
+      for (let v=v0; v<=v1; v++) ctx.lineTo(x(v), yOf(v));
+      ctx.lineTo(x(v1), plotBottom); ctx.closePath();
+      ctx.fillStyle = color; ctx.fill();
+    };
+    // left of t becomes black (unless invert); right of t becomes white
+    fillArea(0, tC, invert ? whiteCol : blackCol);
+    fillArea(tC, 255, invert ? blackCol : whiteCol);
+    // curve outline
+    ctx.lineWidth = 1.4*dpr; ctx.strokeStyle = '#1a1a1c';
+    ctx.beginPath();
+    for (let v=0;v<256;v++){ const yy=yOf(v); if(v===0) ctx.moveTo(x(v),yy); else ctx.lineTo(x(v),yy); }
+    ctx.stroke();
+    // region labels
+    ctx.font = (11*dpr)+'px "JetBrains Mono", monospace'; ctx.textBaseline = 'top';
+    const leftLabel = invert ? '白(255)' : '黒(0)';
+    const rightLabel = invert ? '黒(0)' : '白(255)';
+    ctx.textAlign = 'left'; ctx.fillStyle = invert ? '#b3300f' : '#9a9aa0';
+    if (tC > 28) ctx.fillText('→ '+leftLabel, padL+4*dpr, plotTop+2*dpr);
+    ctx.textAlign = 'right'; ctx.fillStyle = invert ? '#9a9aa0' : '#b3300f';
+    if (tC < 228) ctx.fillText(rightLabel+' ←', padL+plotW-4*dpr, plotTop+2*dpr);
+    // axis freq labels
+    ctx.fillStyle = '#9a9aa0'; ctx.font = (10*dpr)+'px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('高', padL-6*dpr, plotTop+10*dpr);
+    ctx.fillText('低', padL-6*dpr, plotBottom);
+    // gradient bar
+    const barTop = plotBottom + gap;
+    for (let v=0;v<256;v++){ const gx=x(v); ctx.fillStyle='rgb('+v+','+v+','+v+')'; ctx.fillRect(gx, barTop, (plotW/255)+1, barH); }
+    ctx.strokeStyle='#1a1a1c'; ctx.lineWidth=1*dpr; ctx.strokeRect(padL, barTop, plotW, barH);
+    // threshold line + handle
+    const tx = x(tC);
+    ctx.strokeStyle = '#e0411c'; ctx.lineWidth = 2*dpr;
+    ctx.beginPath(); ctx.moveTo(tx, plotTop-4*dpr); ctx.lineTo(tx, barTop+barH+2*dpr); ctx.stroke();
+    // handle triangle on the bar
+    const hy = barTop + barH/2;
+    ctx.fillStyle = '#e0411c';
+    ctx.beginPath(); ctx.moveTo(tx, plotTop-4*dpr); ctx.lineTo(tx-5*dpr, plotTop-12*dpr); ctx.lineTo(tx+5*dpr, plotTop-12*dpr); ctx.closePath(); ctx.fill();
+    // value badge
+    ctx.font = 'bold '+(11*dpr)+'px "JetBrains Mono", monospace'; ctx.textBaseline='bottom';
+    const badge = 't='+tC; const bw = ctx.measureText(badge).width + 10*dpr;
+    let bx = tx - bw/2; bx = Math.max(padL, Math.min(W-padR-bw, bx));
+    ctx.fillStyle = '#e0411c'; ctx.fillRect(bx, plotTop-30*dpr, bw, 15*dpr);
+    ctx.fillStyle = '#fff'; ctx.textAlign='center'; ctx.fillText(badge, bx+bw/2, plotTop-16*dpr);
+    // bottom axis
+    const axisY = barTop + barH + 14*dpr;
+    ctx.fillStyle = '#56565c'; ctx.font = (10*dpr)+'px "JetBrains Mono", monospace'; ctx.textBaseline='alphabetic';
+    ctx.textAlign='left'; ctx.fillText('0', padL, axisY);
+    ctx.textAlign='right'; ctx.fillText('255', padL+plotW, axisY);
+    ctx.textAlign='center'; ctx.fillText('画素値', padL+plotW/2, axisY);
+  }
+  thValFromEvent(e) {
+    const c = e.currentTarget; const rect = c.getBoundingClientRect();
+    const g = this.thGeom; if (!g) return null;
+    let v = Math.round(((e.clientX - rect.left - g.padLcss) / g.plotWcss) * 255);
+    return Math.max(0, Math.min(255, v));
+  }
+
+  // ---------- tone curve playground ----------
+  drawTonePG() {
+    const base = this.getSource(this.state.tcImage, 360, 270);
+    if (!base) return;
+    this.putToCanvas('tc-source', base);
+    this.putToCanvas('tc-result', this.applyToneCurve(base, { channel: this.state.tcChannel, curvePoints: this.state.tcPoints, smooth: this.state.tcSmooth }));
+    this.drawCurveEditor('tc-curve', this.state.tcPoints, this.state.tcChannel, this.state.tcSmooth);
+  }
+  curveColor(channel) {
+    return channel === 'r' ? '#d23b2a' : channel === 'g' ? '#2a9d4a' : channel === 'b' ? '#2a6fdb' : '#e0411c';
+  }
+  drawCurveEditor(id, points, channel, smooth) {
+    const c = document.getElementById(id); if (!c) return;
+    const cw = c.clientWidth || 300, chh = c.clientHeight || 300;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(cw*dpr); c.height = Math.round(chh*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+    const W = c.width, H = c.height, pad = 32*dpr;
+    const px = v => pad + (v/255)*(W-2*pad);
+    const py = v => (H-pad) - (v/255)*(H-2*pad);
+    this.tcGeom = { padCss: pad/dpr, wCss: (W-2*pad)/dpr, hCss: (H-2*pad)/dpr };
+    // grid
+    ctx.strokeStyle = '#f0ede6'; ctx.lineWidth = 1*dpr;
+    for (let i=1;i<4;i++){ const t=i/4; ctx.beginPath(); ctx.moveTo(px(t*255),py(0)); ctx.lineTo(px(t*255),py(255)); ctx.stroke(); ctx.beginPath(); ctx.moveTo(px(0),py(t*255)); ctx.lineTo(px(255),py(t*255)); ctx.stroke(); }
+    ctx.strokeStyle = '#e2e0da'; ctx.setLineDash([4*dpr,3*dpr]); ctx.lineWidth = 1*dpr;
+    ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(px(255),py(255)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = '#1a1a1c'; ctx.lineWidth = 1.4*dpr;
+    ctx.strokeRect(px(0),py(255),px(255)-px(0),py(0)-py(255));
+    const col = this.curveColor(channel);
+    const lut = this.buildLUT(points, smooth);
+    ctx.strokeStyle = col; ctx.lineWidth = 2.6*dpr; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let x=0;x<=255;x++){ const X=px(x), Y=py(lut[x]); x===0?ctx.moveTo(X,Y):ctx.lineTo(X,Y); }
+    ctx.stroke();
+    // handles
+    points.forEach(p => {
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = col; ctx.lineWidth = 2.2*dpr;
+      ctx.beginPath(); ctx.arc(px(p.in),py(p.out),5.5*dpr,0,7); ctx.fill(); ctx.stroke();
+    });
+    ctx.fillStyle = '#b0b0b6'; ctx.font = (9*dpr)+"px 'JetBrains Mono', monospace";
+    // axis tick numbers (0,64,128,192,255)
+    const ticks = [0,64,128,192,255];
+    ctx.fillStyle = '#9a9aa0'; ctx.font = (8.5*dpr)+"px 'JetBrains Mono', monospace";
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ticks.forEach(t => ctx.fillText(String(t), px(t), py(0)+5*dpr));
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ticks.forEach(t => ctx.fillText(String(t), px(0)-5*dpr, py(t)));
+    ctx.fillStyle = '#b0b0b6'; ctx.font = (9*dpr)+"px 'JetBrains Mono', monospace";
+    ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('入力→', px(0)+2*dpr, py(0)+16*dpr);
+    ctx.save(); ctx.translate(px(0)-16*dpr, py(0)); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('出力→',0,-11*dpr); ctx.restore();
+  }
+  tcPointFromEvent(e, grab) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const g = this.tcGeom; if (!g) return;
+    const inputV = ((e.clientX - rect.left - g.padCss) / g.wCss) * 255;
+    let outV = 255 - ((e.clientY - rect.top - g.padCss) / g.hCss) * 255;
+    outV = Math.max(0, Math.min(255, Math.round(outV)));
+    const pts = this.state.tcPoints;
+    if (grab) {
+      let best = 0, bd = Infinity;
+      pts.forEach((p,i) => { const d = Math.abs(p.in - inputV); if (d < bd) { bd = d; best = i; } });
+      this._tcIdx = best;
+    }
+    if (this._tcIdx == null) return;
+    const np = pts.map((p,i) => i === this._tcIdx ? { in: p.in, out: outV } : p);
+    this.setState({ tcPoints: np });
+  }
+
+  // ---------- geometric playground ----------
+  gpNum(s){ const v = parseFloat(s); return isFinite(v) ? v : 0; }
+  gpToNumMat(m){ return m.map(row => row.map(s => this.gpNum(s))); }
+  mat3mul(A, B){
+    const C = [[0,0,0],[0,0,0],[0,0,0]];
+    for(let i=0;i<3;i++) for(let j=0;j<3;j++){ let s=0; for(let k=0;k<3;k++) s += A[i][k]*B[k][j]; C[i][j]=s; }
+    return C;
+  }
+  drawGeoPG() {
+    const q = { src: this.state.gpImage, region: { x0:0, y0:0, x1:3, y1:3 }, R: 4 };
+    this.gPhotoPlane('gp-before', q, { A:1, B:0, C:0, D:1, E:0, F:0 }, false);
+    const R = this.gpToNumMat(this.state.gpMatR);
+    const M = this.gpToNumMat(this.state.gpMatM);
+    const m = this.mat3mul(R, M);
+    const aff = { A:m[0][0], B:m[0][1], E:m[0][2], C:m[1][0], D:m[1][1], F:m[1][2], G:m[2][0], H:m[2][1], I:m[2][2] };
+    this.gPhotoPlane('gp-after', q, aff, true);
+  }
+  setGpCell(which, r, c, raw) {
+    const key = which === 'R' ? 'gpMatR' : 'gpMatM';
+    const m = this.state[key].map(row => row.slice());
+    m[r][c] = raw;
+    this.setState({ [key]: m });
+  }
+  gpRound(v) { return Math.abs(v) < 1e-9 ? 0 : Math.round(v * 1000) / 1000; }
+  applyGpTransform(which, over) {
+    const suf = which;
+    const rot   = over.rot   !== undefined ? over.rot   : this.state['gpRot'+suf];
+    const scale = over.scale !== undefined ? over.scale : this.state['gpScale'+suf];
+    const tx    = over.tx    !== undefined ? over.tx    : this.state['gpTx'+suf];
+    const ty    = over.ty    !== undefined ? over.ty    : this.state['gpTy'+suf];
+    const rad = rot * Math.PI / 180;
+    const c = Math.cos(rad), s = Math.sin(rad);
+    const m = [
+      [this.gpRound(scale * c), this.gpRound(-scale * s), this.gpRound(tx)],
+      [this.gpRound(scale * s), this.gpRound(scale * c),  this.gpRound(ty)],
+      [0, 0, 1],
+    ];
+    this.setState({
+      ['gpRot'+suf]: rot, ['gpScale'+suf]: scale, ['gpTx'+suf]: tx, ['gpTy'+suf]: ty,
+      ['gpMat'+suf]: m,
+    });
+  }
+  resetGp(which) {
+    const suf = which;
+    this.setState({
+      ['gpRot'+suf]: 0, ['gpScale'+suf]: 1, ['gpTx'+suf]: 0, ['gpTy'+suf]: 0,
+      ['gpMat'+suf]: [[1,0,0],[0,1,0],[0,0,1]],
+    });
+  }
+  makeGpPresets(which) {
+    const key = which === 'R' ? 'gpMatR' : 'gpMatM';
+    const accent = which === 'R' ? '#e0411c' : '#2a6fdb';
+    return [
+      { label:'リセット', m:[[1,0,0],[0,1,0],[0,0,1]], reset:true },
+      { label:'回転45°', m:[[0.7071,-0.7071,0],[0.7071,0.7071,0],[0,0,1]] },
+      { label:'回転90°', m:[[0,-1,0],[1,0,0],[0,0,1]] },
+      { label:'拡大1.5×', m:[[1.5,0,0],[0,1.5,0],[0,0,1]] },
+      { label:'縮小0.6×', m:[[0.6,0,0],[0,0.6,0],[0,0,1]] },
+      { label:'y軸鏡映', m:[[-1,0,0],[0,1,0],[0,0,1]] },
+      { label:'x軸鏡映', m:[[1,0,0],[0,-1,0],[0,0,1]] },
+      { label:'水平せん断', m:[[1,0.5,0],[0,1,0],[0,0,1]] },
+      { label:'平行移動', m:[[1,0,1.5],[0,1,0],[0,0,1]] },
+      { label:'射影(遠近)', m:[[1,0,0],[0,1,0],[0.2,0,1]] },
+    ].map(o => ({ label: o.label, onClick: () => (o.reset ? this.resetGp(which) : this.setState({ [key]: o.m })),
+      style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'11px', padding:'5px 9px', cursor:'pointer', border:'1px solid '+accent+'55', background:'#fcfbf8', color:accent } }));
+  }
+
+  // ---------- fourier playground (edit spectrum + apply filter mask, both live) ----------
+  fpEnsureBuffers() {
+    const N = this.fpN;
+    if (!this.fpRe || this.fpRe.length !== N * N) { this.fpRe = new Float64Array(N * N); this.fpIm = new Float64Array(N * N); this.fpLoadedKey = null; }
+    if (!this.fpMask || this.fpMask.length !== N * N) { this.fpMask = new Float32Array(N * N).fill(1); }
+  }
+  fpLoadSource() {
+    const N = this.fpN, key = this.state.fpImage;
+    const sq = this.getSquareGray(key, N);
+    if (!sq) return null;
+    this.putToCanvas('fp-source', sq.imageData);
+    if (this.fpLoadedKey !== key) {
+      const spec = this.forwardFFT(key, N, sq.gray);
+      this.fpRe.set(spec.re); this.fpIm.set(spec.im);   // editable spectrum starts as the image's FFT
+      this.fpMask.fill(1);                               // filter starts all-pass
+      // display normalization: image spectra normalize to their own max; pure-paint (black) uses fixed white ref
+      let max = 1e-9;
+      for (let i = 0; i < N * N; i++) { const m = Math.log(1 + Math.hypot(spec.re[i], spec.im[i])); if (m > max) max = m; }
+      this.fpSpecMax = max;
+      this.fpLoadedKey = key;
+    }
+    return sq;
+  }
+  fpDisplayRef() {
+    // black image has no spectrum energy -> use the white-paint reference so painted dots show at full brightness
+    return (this.state.fpImage === 'black') ? Math.log(1 + this.fpWhite) : (this.fpSpecMax || Math.log(1 + this.fpWhite));
+  }
+  renderFourierSpectrum() {
+    const N = this.fpN, c = document.getElementById('fp-spectrum');
+    if (!c) return;
+    if (c.width !== N) c.width = N; if (c.height !== N) c.height = N;
+    const half = N / 2, ref = this.fpDisplayRef(), out = new Uint8ClampedArray(N * N * 4);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const uy = (y + half) % N, ux = (x + half) % N, u = uy * N + ux;  // centered -> unshifted
+      const mag = Math.hypot(this.fpRe[u], this.fpIm[u]);
+      let a = Math.log(1 + mag) / ref; if (a > 1) a = 1; if (a < 0) a = 0;
+      const v = a * 255, o = (y * N + x) * 4;
+      if (this.fpMask[u] < 0.5) { out[o] = 78 + v * 0.5; out[o + 1] = 16; out[o + 2] = 22; }  // filtered-out: red tint
+      else { out[o] = v; out[o + 1] = v; out[o + 2] = v; }
+      out[o + 3] = 255;
+    }
+    c.getContext('2d').putImageData(new ImageData(out, N, N), 0, 0);
+  }
+  renderFourierResult() {
+    const N = this.fpN;
+    const re = new Float64Array(N * N), im = new Float64Array(N * N);
+    for (let i = 0; i < N * N; i++) { const m = this.fpMask[i]; re[i] = this.fpRe[i] * m; im[i] = this.fpIm[i] * m; }
+    this.fft2d(re, im, N, true);
+    const out = new Uint8ClampedArray(N * N * 4);
+    for (let i = 0; i < N * N; i++) { const v = this.clamp(Math.round(re[i])), o = i * 4; out[o] = out[o + 1] = out[o + 2] = v; out[o + 3] = 255; }
+    this.putToCanvas('fp-result', new ImageData(out, N, N));
+  }
+  drawFourierPlayground() {
+    this.fpEnsureBuffers();
+    if (!this.fpLoadSource()) return;
+    this.renderFourierSpectrum();
+    this.renderFourierResult();
+    this.bindFourierPaint();
+  }
+  fpPaintAt(cx, cy) {
+    const N = this.fpN, half = N / 2;
+    const r = this.state.fpBrushSize, r2 = (r + 0.5) * (r + 0.5);   // midpoint radius -> rounder disk at small sizes
+    const square = this.state.fpBrushShape === 'square';
+    const tool = this.state.fpBrush;                       // 'white' | 'black' | 'cut' | 'keep'
+    const isMask = (tool === 'cut' || tool === 'keep');
+    const reVal = tool === 'white' ? this.fpWhite : 0;
+    const maskVal = tool === 'keep' ? 1 : 0;
+    const bound = square ? Math.round(r) : Math.ceil(r);
+    for (let dy = -bound; dy <= bound; dy++) for (let dx = -bound; dx <= bound; dx++) {
+      if (!square && dx * dx + dy * dy > r2) continue;
+      const px = cx + dx, py = cy + dy;                 // centered coords
+      if (px < 0 || px >= N || py < 0 || py >= N) continue;
+      const qx = (N - px) % N, qy = (N - py) % N;       // centered symmetric partner
+      const ux = (px + half) % N, uy = (py + half) % N; // -> unshifted bin
+      const sx = (qx + half) % N, sy = (qy + half) % N;
+      if (isMask) {
+        this.fpMask[uy * N + ux] = maskVal;
+        this.fpMask[sy * N + sx] = maskVal;
+      } else {
+        this.fpRe[uy * N + ux] = reVal; this.fpIm[uy * N + ux] = 0;
+        this.fpRe[sy * N + sx] = reVal; this.fpIm[sy * N + sx] = 0;
+      }
+    }
+  }
+  bindFourierPaint() {
+    const c = document.getElementById('fp-spectrum');
+    if (!c || this.fpBoundEl === c) return;
+    this.fpBoundEl = c;
+    const N = this.fpN;
+    const toCell = (e) => {
+      const rect = c.getBoundingClientRect();
+      const cx = Math.floor((e.clientX - rect.left) / rect.width * N);
+      const cy = Math.floor((e.clientY - rect.top) / rect.height * N);
+      return [cx, cy];
+    };
+    let resultScheduled = false;
+    const scheduleResult = () => {
+      if (resultScheduled) return;
+      resultScheduled = true;
+      requestAnimationFrame(() => { resultScheduled = false; this.renderFourierResult(); });
+    };
+    const paint = (e) => {
+      const [cx, cy] = toCell(e);
+      this.fpPaintAt(cx, cy);
+      this.renderFourierSpectrum();
+      scheduleResult();
+    };
+    let down = false;
+    c.addEventListener('pointerdown', (e) => { down = true; c.setPointerCapture(e.pointerId); paint(e); e.preventDefault(); });
+    c.addEventListener('pointermove', (e) => { if (down) paint(e); });
+    c.addEventListener('pointerup', () => { down = false; this.renderFourierResult(); });
+    c.addEventListener('pointerleave', () => { if (down) this.renderFourierResult(); });
+  }
+  applyFourierPreset(name) {
+    const N = this.fpN, half = N / 2;
+    this.fpEnsureBuffers();
+    if (name === 'reload') { this.fpLoadedKey = null; }
+    else if (name === 'clearSpec') { this.fpRe.fill(0); this.fpIm.fill(0); }
+    else if (name === 'allpass') { this.fpMask.fill(1); }
+    else if (name === 'low' || name === 'high') {
+      const R = N * 0.12, R2 = R * R;
+      for (let u = 0; u < N * N; u++) {
+        const ux = u % N, uy = (u / N) | 0;
+        const cx = (ux + half) % N, cy = (uy + half) % N;       // unshifted -> centered
+        const d2 = (cx - half) * (cx - half) + (cy - half) * (cy - half);
+        const keep = name === 'low' ? d2 <= R2 : d2 > R2;
+        this.fpMask[u] = keep ? 1 : 0;
+      }
+    }
+    else if (name === 'band') {
+      const Rin = N * 0.08, Rin2 = Rin * Rin, Rout = N * 0.24, Rout2 = Rout * Rout;
+      for (let u = 0; u < N * N; u++) {
+        const ux = u % N, uy = (u / N) | 0;
+        const cx = (ux + half) % N, cy = (uy + half) % N;
+        const d2 = (cx - half) * (cx - half) + (cy - half) * (cy - half);
+        this.fpMask[u] = (d2 >= Rin2 && d2 <= Rout2) ? 1 : 0;   // keep a mid-frequency ring
+      }
+    }
+    this.setState({ fpVer: this.state.fpVer + 1 });
+  }
+  getSource(key, w, h) {
+    const im = this.imgs[key];
+    if (!im) return null;
+    const ck = key + '_' + w + 'x' + h;
+    if (this.srcCache[ck]) return this.srcCache[ck];
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    const ar = im.width / im.height, tr = w / h;
+    let dw, dh;
+    if (ar > tr) { dh = h; dw = h * ar; } else { dw = w; dh = w / ar; }
+    ctx.drawImage(im, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    const id = ctx.getImageData(0, 0, w, h);
+    this.srcCache[ck] = id;
+    return id;
+  }
+
+  // ---------- processors ----------
+  clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+  process(base, ch) {
+    const p = ch.params;
+    switch (ch.fn) {
+      case 'applyToneCurve': return this.applyToneCurve(base, p);
+      case 'applyKernel':    return this.applyKernel(base, p.kernel, p.scale == null ? 1 : p.scale);
+      case 'applyThreshold': return this.applyThreshold(base, p);
+      case 'applyGeometric': return this.applyGeometric(base, p);
+    }
+    return base;
+  }
+  buildLUT(points, smooth) {
+    const lut = new Uint8ClampedArray(256);
+    const pts = points.slice().sort((a, b) => a.in - b.in);
+    const n = pts.length;
+    let tangents = null;
+    if (smooth && n >= 2) {
+      // Monotone cubic (Fritsch–Carlson / PCHIP): smooth but never overshoots,
+      // so the curve stays well-behaved near 0 and 255 even with uneven spacing.
+      const h = new Array(n - 1), delta = new Array(n - 1);
+      for (let i = 0; i < n - 1; i++) {
+        h[i] = pts[i + 1].in - pts[i].in;
+        delta[i] = h[i] !== 0 ? (pts[i + 1].out - pts[i].out) / h[i] : 0;
+      }
+      const m = new Array(n);
+      m[0] = delta[0];
+      m[n - 1] = delta[n - 2];
+      for (let i = 1; i < n - 1; i++) {
+        if (delta[i - 1] * delta[i] <= 0) {
+          m[i] = 0;
+        } else {
+          const w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1];
+          m[i] = (w1 + w2) / (w1 / delta[i - 1] + w2 / delta[i]);
+        }
+      }
+      tangents = m;
+    }
+    for (let x = 0; x < 256; x++) {
+      if (x <= pts[0].in) { lut[x] = pts[0].out; continue; }
+      if (x >= pts[n - 1].in) { lut[x] = pts[n - 1].out; continue; }
+      let ki = 0;
+      for (let k = 0; k < n - 1; k++) {
+        if (x >= pts[k].in && x <= pts[k + 1].in) { ki = k; break; }
+      }
+      const p0 = pts[ki], p1 = pts[ki + 1];
+      const hseg = p1.in - p0.in;
+      const t = (x - p0.in) / hseg;
+      if (smooth && tangents) {
+        const t2 = t * t, t3 = t2 * t;
+        const h00 = 2 * t3 - 3 * t2 + 1, h10 = t3 - 2 * t2 + t;
+        const h01 = -2 * t3 + 3 * t2, h11 = t3 - t2;
+        const out = h00 * p0.out + h10 * hseg * tangents[ki]
+          + h01 * p1.out + h11 * hseg * tangents[ki + 1];
+        lut[x] = Math.round(out);
+      } else {
+        lut[x] = Math.round(p0.out + (p1.out - p0.out) * t);
+      }
+    }
+    return lut;
+  }
+  applyToneCurve(src, { channel, curvePoints, smooth }) {
+    const lut = this.buildLUT(curvePoints, smooth);
+    const out = new Uint8ClampedArray(src.data);
+    for (let i = 0; i < out.length; i += 4) {
+      if (channel === 'r' || channel === 'rgb') out[i]     = lut[out[i]];
+      if (channel === 'g' || channel === 'rgb') out[i + 1] = lut[out[i + 1]];
+      if (channel === 'b' || channel === 'rgb') out[i + 2] = lut[out[i + 2]];
+    }
+    return new ImageData(out, src.width, src.height);
+  }
+  applyKernel(src, kernel, scale) {
+    const w = src.width, h = src.height, data = src.data;
+    const out = new Uint8ClampedArray(data.length);
+    const kSum = kernel.flat().reduce((a, b) => a + b, 0);
+    const eff = scale !== 1 ? scale : (kSum !== 0 ? 1 / kSum : null);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      let r = 0, g = 0, b = 0;
+      for (let ky = 0; ky < 3; ky++) for (let kx = 0; kx < 3; kx++) {
+        const sy = Math.min(h - 1, Math.max(0, y + ky - 1));
+        const sx = Math.min(w - 1, Math.max(0, x + kx - 1));
+        const idx = (sy * w + sx) * 4, wt = kernel[ky][kx];
+        r += data[idx] * wt; g += data[idx + 1] * wt; b += data[idx + 2] * wt;
+      }
+      const di = (y * w + x) * 4;
+      if (eff !== null) {
+        out[di] = this.clamp(Math.round(r * eff)); out[di + 1] = this.clamp(Math.round(g * eff)); out[di + 2] = this.clamp(Math.round(b * eff));
+      } else {
+        out[di] = this.clamp(Math.abs(Math.round(r)) + 128); out[di + 1] = this.clamp(Math.abs(Math.round(g)) + 128); out[di + 2] = this.clamp(Math.abs(Math.round(b)) + 128);
+      }
+      out[di + 3] = data[di + 3];
+    }
+    return new ImageData(out, w, h);
+  }
+  otsu(src) {
+    const d = src.data, hist = new Array(256).fill(0);
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) { const g = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]); hist[g]++; n++; }
+    let sum = 0; for (let t = 0; t < 256; t++) sum += t * hist[t];
+    let sumB = 0, wB = 0, maxVar = -1, thr = 127;
+    for (let t = 0; t < 256; t++) {
+      wB += hist[t]; if (wB === 0) continue;
+      const wF = n - wB; if (wF === 0) break;
+      sumB += t * hist[t];
+      const mB = sumB / wB, mF = (sum - sumB) / wF;
+      const v = wB * wF * (mB - mF) * (mB - mF);
+      if (v > maxVar) { maxVar = v; thr = t; }
+    }
+    return thr;
+  }
+  applyThreshold(src, p) {
+    const out = new Uint8ClampedArray(src.data);
+    let t = p.threshold;
+    if (t === 'otsu') t = this.otsu(src);
+    for (let i = 0; i < out.length; i += 4) {
+      const g = 0.299 * out[i] + 0.587 * out[i + 1] + 0.114 * out[i + 2];
+      if (p.gray) { const gv = Math.round(g); out[i] = out[i + 1] = out[i + 2] = gv; continue; }
+      let v = g >= t ? 255 : 0;
+      if (p.invert) v = 255 - v;
+      out[i] = out[i + 1] = out[i + 2] = v;
+    }
+    return new ImageData(out, src.width, src.height);
+  }
+  applyGeometric(src, p) {
+    const w = src.width, h = src.height;
+    const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h;
+    tmp.getContext('2d').putImageData(src, 0, 0);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#0e0e10'; ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+    if (p.type === 'rotate') ctx.rotate(p.deg * Math.PI / 180);
+    else if (p.type === 'scale') ctx.scale(p.sx, p.sy);
+    else if (p.type === 'flip') ctx.scale(p.axis === 'h' ? -1 : 1, p.axis === 'v' ? -1 : 1);
+    else if (p.type === 'translate') ctx.translate(p.dx * w, p.dy * h);
+    ctx.translate(-w / 2, -h / 2);
+    ctx.drawImage(tmp, 0, 0);
+    ctx.restore();
+    return ctx.getImageData(0, 0, w, h);
+  }
+
+  // ---------- frequency-domain (real 2D FFT) ----------
+  fft1d(re, im, inverse) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { const tr = re[i]; re[i] = re[j]; re[j] = tr; const ti = im[i]; im[i] = im[j]; im[j] = ti; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = (inverse ? 2 : -2) * Math.PI / len;
+      const wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let cwr = 1, cwi = 0;
+        const half = len >> 1;
+        for (let k = 0; k < half; k++) {
+          const a = i + k, b = i + k + half;
+          const vRe = re[b] * cwr - im[b] * cwi;
+          const vIm = re[b] * cwi + im[b] * cwr;
+          re[b] = re[a] - vRe; im[b] = im[a] - vIm;
+          re[a] = re[a] + vRe; im[a] = im[a] + vIm;
+          const ncwr = cwr * wr - cwi * wi; cwi = cwr * wi + cwi * wr; cwr = ncwr;
+        }
+      }
+    }
+    if (inverse) { for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; } }
+  }
+  fft2d(re, im, n, inverse) {
+    const lr = new Float64Array(n), li = new Float64Array(n);
+    for (let y = 0; y < n; y++) {
+      const off = y * n;
+      for (let x = 0; x < n; x++) { lr[x] = re[off + x]; li[x] = im[off + x]; }
+      this.fft1d(lr, li, inverse);
+      for (let x = 0; x < n; x++) { re[off + x] = lr[x]; im[off + x] = li[x]; }
+    }
+    for (let x = 0; x < n; x++) {
+      for (let y = 0; y < n; y++) { lr[y] = re[y * n + x]; li[y] = im[y * n + x]; }
+      this.fft1d(lr, li, inverse);
+      for (let y = 0; y < n; y++) { re[y * n + x] = lr[y]; im[y * n + x] = li[y]; }
+    }
+  }
+  getSquareGray(src, N) {
+    if (src === 'black') {
+      const ck0 = 'sqgray_black_' + N;
+      if (this.srcCache[ck0]) return this.srcCache[ck0];
+      const gray = new Float64Array(N * N);
+      const d = new Uint8ClampedArray(N * N * 4);
+      for (let i = 0; i < N * N; i++) { d[i * 4 + 3] = 255; }
+      const res = { gray, imageData: new ImageData(d, N, N) };
+      this.srcCache[ck0] = res;
+      return res;
+    }
+    if (src.indexOf('pat_') === 0) {
+      const ck1 = 'sqgray_' + src + '_' + N;
+      if (this.srcCache[ck1]) return this.srcCache[ck1];
+      const gray = this.patternGray(src.slice(4), N);
+      const d = new Uint8ClampedArray(N * N * 4);
+      for (let i = 0; i < N * N; i++) { const v = gray[i], o = i * 4; d[o] = d[o + 1] = d[o + 2] = v; d[o + 3] = 255; }
+      const res = { gray, imageData: new ImageData(d, N, N) };
+      this.srcCache[ck1] = res;
+      return res;
+    }
+    const im = this.imgs[src];
+    if (!im) return null;
+    const ck = 'sqgray_' + src + '_' + N;
+    if (this.srcCache[ck]) return this.srcCache[ck];
+    const c = document.createElement('canvas'); c.width = N; c.height = N;
+    const ctx = c.getContext('2d');
+    const ar = im.width / im.height;
+    let dw, dh;
+    if (ar > 1) { dh = N; dw = N * ar; } else { dw = N; dh = N / ar; }
+    ctx.drawImage(im, (N - dw) / 2, (N - dh) / 2, dw, dh);
+    const id = ctx.getImageData(0, 0, N, N);
+    const d = id.data, gray = new Float64Array(N * N);
+    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+      const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      gray[p] = g; d[i] = d[i + 1] = d[i + 2] = g;
+    }
+    const res = { gray, imageData: id };
+    this.srcCache[ck] = res;
+    return res;
+  }
+  forwardFFT(src, N, gray) {
+    this.fftCache = this.fftCache || {};
+    const ck = 'fwd_' + src + '_' + N;
+    if (this.fftCache[ck]) return this.fftCache[ck];
+    const re = new Float64Array(gray), im = new Float64Array(N * N);
+    this.fft2d(re, im, N, false);
+    const r = { re, im };
+    this.fftCache[ck] = r;
+    return r;
+  }
+  maskKey(p) { return [p.type, p.sigma, p.angle, p.width, p.center, p.gain].join('_'); }
+  maskVal(p, fu, fv) {
+    const r2 = fu * fu + fv * fv;
+    switch (p.type) {
+      case 'lowpass':  { const s = p.sigma; return Math.exp(-r2 / (2 * s * s)); }
+      case 'highpass': { const s = p.sigma; return 1 - Math.exp(-r2 / (2 * s * s)); }
+      case 'bandpass': { const s = p.sigma, c = p.center, r = Math.sqrt(r2); return Math.exp(-((r - c) * (r - c)) / (2 * s * s)); }
+      case 'directional': { const a = p.angle * Math.PI / 180, perp = fu * Math.sin(a) - fv * Math.cos(a), s = p.width; return Math.exp(-(perp * perp) / (2 * s * s)); }
+    }
+    return 1;
+  }
+  freqResult(src, params, N, spec) {
+    this.fresCache = this.fresCache || {};
+    const ck = 'fres_' + src + '_' + N + '_' + this.maskKey(params);
+    if (this.fresCache[ck]) return this.fresCache[ck];
+    const re = new Float64Array(spec.re), im = new Float64Array(spec.im);
+    const shift = (params.type === 'highpass' || params.type === 'bandpass');
+    for (let y = 0; y < N; y++) {
+      const fv = y < N / 2 ? y : y - N;
+      for (let x = 0; x < N; x++) {
+        const fu = x < N / 2 ? x : x - N;
+        const m = this.maskVal(params, fu, fv), idx = y * N + x;
+        re[idx] *= m; im[idx] *= m;
+      }
+    }
+    this.fft2d(re, im, N, true);
+    const out = new Uint8ClampedArray(N * N * 4);
+    const gain = params.gain || 1;
+    for (let p = 0; p < N * N; p++) {
+      let v = re[p] * gain;
+      if (shift) v += 128;
+      v = v < 0 ? 0 : v > 255 ? 255 : v;
+      const o = p * 4;
+      out[o] = out[o + 1] = out[o + 2] = v; out[o + 3] = 255;
+    }
+    const id = new ImageData(out, N, N);
+    this.fresCache[ck] = id;
+    return id;
+  }
+  drawFilterPreview(id, params) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const S = 150, N = 256;
+    c.width = S; c.height = S;
+    const ctx = c.getContext('2d'), img = ctx.createImageData(S, S), d = img.data;
+    for (let py = 0; py < S; py++) {
+      const fv = (py / S - 0.5) * N;
+      for (let px = 0; px < S; px++) {
+        const fu = (px / S - 0.5) * N;
+        const v = Math.round(this.maskVal(params, fu, fv) * 255), o = (py * S + px) * 4;
+        d[o] = d[o + 1] = d[o + 2] = v; d[o + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  putSquareCover(id, imgData, N) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    c.width = 256; c.height = 150;
+    const off = document.createElement('canvas'); off.width = N; off.height = N;
+    off.getContext('2d').putImageData(imgData, 0, 0);
+    c.getContext('2d').drawImage(off, 0, (N - 150) / 2, N, 150, 0, 0, 256, 150);
+  }
+  // ---------- tone-curve graph drawing (img -> which curve) ----------
+  drawCurveGraph(id, points){
+    const c = document.getElementById(id); if(!c) return;
+    const cw = c.clientWidth || 180, ch = c.clientHeight || 180;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(cw*dpr); c.height = Math.round(ch*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+    const W = c.width, H = c.height, pad = 14*dpr;
+    const px = v => pad + (v/255)*(W-2*pad);
+    const py = v => (H-pad) - (v/255)*(H-2*pad);
+    // grid
+    ctx.strokeStyle = '#f0ede6'; ctx.lineWidth = 1*dpr;
+    for(let i=1;i<4;i++){ const t=i/4; ctx.beginPath(); ctx.moveTo(px(t*255),py(0)); ctx.lineTo(px(t*255),py(255)); ctx.stroke(); ctx.beginPath(); ctx.moveTo(px(0),py(t*255)); ctx.lineTo(px(255),py(t*255)); ctx.stroke(); }
+    // identity diagonal
+    ctx.strokeStyle = '#e2e0da'; ctx.setLineDash([4*dpr,3*dpr]); ctx.lineWidth = 1*dpr;
+    ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(px(255),py(255)); ctx.stroke(); ctx.setLineDash([]);
+    // axes box
+    ctx.strokeStyle = '#1a1a1c'; ctx.lineWidth = 1.4*dpr;
+    ctx.strokeRect(px(0),py(255),px(255)-px(0),py(0)-py(255));
+    // curve via LUT for smoothness
+    const lut = this.buildLUT(points);
+    ctx.strokeStyle = '#e0411c'; ctx.lineWidth = 2.6*dpr; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for(let x=0;x<=255;x++){ const X=px(x), Y=py(lut[x]); x===0?ctx.moveTo(X,Y):ctx.lineTo(X,Y); }
+    ctx.stroke();
+    // control points
+    ctx.fillStyle = '#e0411c';
+    points.forEach(p=>{ ctx.beginPath(); ctx.arc(px(p.in),py(p.out),3*dpr,0,7); ctx.fill(); });
+    // axis labels
+    ctx.fillStyle = '#b0b0b6'; ctx.font = (8.5*dpr)+"px 'JetBrains Mono', monospace";
+    ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('入力→', px(0)+2*dpr, py(0)+3*dpr);
+    ctx.save(); ctx.translate(px(0)-3*dpr, py(0)); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('出力→',0,-10*dpr); ctx.restore();
+  }
+  drawToneId(q){
+    const base = this.getSource(q.src, 512, 300);
+    if(!base) return;
+    this.putToCanvas('q-source', base);
+    const ans = q.choices[q.answer];
+    this.putToCanvas('q-result', this.applyToneCurve(base, {channel: q.channel || 'rgb', curvePoints: ans.curvePoints}));
+    q.choices.forEach((ch,i)=> this.drawCurveGraph('q-choice-'+i, ch.curvePoints));
+  }
+  drawHistThresh(q){
+    const base = this.getSource(q.src, 256, 150);
+    if(!base) return;
+    // 〈1〉 grayscale version
+    const gd = new Uint8ClampedArray(base.data);
+    for(let i=0;i<gd.length;i+=4){ const g=Math.round(0.299*gd[i]+0.587*gd[i+1]+0.114*gd[i+2]); gd[i]=gd[i+1]=gd[i+2]=g; }
+    this.putToCanvas('q-hist-src', new ImageData(gd, base.width, base.height));
+    // 〈2〉 binary at the correct threshold
+    const t = q.marks[q.answer];
+    this.putToCanvas('q-hist-bin', this.applyThreshold(base, {threshold:t}));
+    // histogram (figure 3) with numbered markers
+    this.drawHistogram('q-hist', base, q.marks, q.answer);
+  }
+  drawHistMatch(q){
+    (q.imgSrcs || []).forEach((s, i) => {
+      const b = this.getSource(s, 200, 150);
+      if (!b) return;
+      const gd = new Uint8ClampedArray(b.data);
+      for (let k = 0; k < gd.length; k += 4) { const g = Math.round(0.299*gd[k]+0.587*gd[k+1]+0.114*gd[k+2]); gd[k]=gd[k+1]=gd[k+2]=g; }
+      this.putToCanvas('q-hm-img-'+i, new ImageData(gd, b.width, b.height));
+    });
+    (q.histSrcs || []).forEach((s, i) => {
+      const b = this.getSource(s, 200, 150);
+      if (b) this.drawHistogram('q-hm-hist-'+i, b, [], -1);
+    });
+  }
+  drawHistogram(id, src, marks, answerIdx){
+    const c = document.getElementById(id); if(!c) return;
+    const cw = c.clientWidth || 480, chh = c.clientHeight || 188;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(cw*dpr); c.height = Math.round(chh*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+    const W = c.width, H = c.height;
+    const padL = 30*dpr, padR = 14*dpr, padT = 16*dpr;
+    const barH = 13*dpr, gap = 4*dpr, markH = 26*dpr;
+    const plotBottom = H - markH - gap - barH - gap - 16*dpr;
+    const plotTop = padT;
+    const plotW = W - padL - padR;
+    const x = v => padL + (v/255)*plotW;
+    // histogram counts
+    const d = src.data, hist = new Array(256).fill(0);
+    for(let i=0;i<d.length;i+=4){ const g=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]); hist[g]++; }
+    // light smoothing for a clean curve
+    const sm = new Array(256).fill(0);
+    for(let v=0;v<256;v++){ let s=0,n=0; for(let k=-2;k<=2;k++){const j=v+k; if(j>=0&&j<256){s+=hist[j];n++;}} sm[v]=s/n; }
+    const maxV = Math.max(...sm) || 1;
+    // filled histogram area
+    ctx.beginPath();
+    ctx.moveTo(x(0), plotBottom);
+    for(let v=0;v<256;v++){ ctx.lineTo(x(v), plotBottom - (sm[v]/maxV)*(plotBottom-plotTop)); }
+    ctx.lineTo(x(255), plotBottom);
+    ctx.closePath();
+    ctx.fillStyle = '#e7e4dd'; ctx.fill();
+    ctx.lineWidth = 1.4*dpr; ctx.strokeStyle = '#1a1a1c';
+    ctx.beginPath();
+    for(let v=0;v<256;v++){ const yy = plotBottom - (sm[v]/maxV)*(plotBottom-plotTop); if(v===0) ctx.moveTo(x(v),yy); else ctx.lineTo(x(v),yy); }
+    ctx.stroke();
+    // axis labels (高頻度 / 低)
+    ctx.fillStyle = '#9a9aa0'; ctx.font = (10*dpr)+'px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('高', padL-6*dpr, plotTop+10*dpr);
+    ctx.fillText('低', padL-6*dpr, plotBottom);
+    // gradient bar (0..255 grayscale)
+    const barTop = plotBottom + gap;
+    for(let v=0;v<256;v++){ const gx = x(v); ctx.fillStyle = 'rgb('+v+','+v+','+v+')'; ctx.fillRect(gx, barTop, (plotW/255)+1, barH); }
+    ctx.strokeStyle = '#1a1a1c'; ctx.lineWidth = 1*dpr;
+    ctx.strokeRect(padL, barTop, plotW, barH);
+    // markers ①②③④ (arrows up to the bar, numbers below)
+    const circ = ['①','②','③','④'];
+    const markY = barTop + barH + 3*dpr;
+    marks.forEach((m, i) => {
+      const mx = x(m);
+      ctx.strokeStyle = '#2a6fdb'; ctx.fillStyle = '#2a6fdb'; ctx.lineWidth = 1.6*dpr;
+      ctx.beginPath(); ctx.moveTo(mx, markY+12*dpr); ctx.lineTo(mx, markY+4*dpr); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mx, markY); ctx.lineTo(mx-3.5*dpr, markY+6*dpr); ctx.lineTo(mx+3.5*dpr, markY+6*dpr); ctx.closePath(); ctx.fill();
+      ctx.font = (13*dpr)+'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillStyle = '#1a1a1c';
+      ctx.fillText(circ[i], mx, markY+14*dpr);
+      ctx.textBaseline = 'alphabetic';
+    });
+    // bottom axis: 0 / 画素値 / 255
+    const axisY = markY + 14*dpr + 16*dpr;
+    ctx.fillStyle = '#56565c'; ctx.font = (10*dpr)+'px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left'; ctx.fillText('0', padL, axisY);
+    ctx.textAlign = 'right'; ctx.fillText('255', padL+plotW, axisY);
+    ctx.textAlign = 'center'; ctx.fillText('画素値', padL+plotW/2, axisY);
+  }
+  GFIG = [[1,1],[1,4],[2,4],[2,2],[4,2],[4,1]];
+
+  affFromMat(m){ return {A:m[0][0],B:m[0][1],C:m[1][0],D:m[1][1],E:0,F:0}; }
+  applyAff(a,x,y){
+    if(a.G !== undefined){
+      let w = a.G*x + a.H*y + a.I; if(Math.abs(w) < 1e-6) w = (w<0?-1:1)*1e-6;
+      return [(a.A*x + a.B*y + a.E)/w, (a.C*x + a.D*y + a.F)/w];
+    }
+    return [a.A*x + a.B*y + a.E, a.C*x + a.D*y + a.F];
+  }
+  affRotateAboutCenter(q, sign){
+    const th = sign * q.deg * Math.PI/180;
+    const cs = Math.cos(th), sn = Math.sin(th);
+    const cx = (q.region.x0 + q.region.x1)/2, cy = (q.region.y0 + q.region.y1)/2;
+    return { A:cs, B:-sn, C:sn, D:cs, E:cx-(cs*cx - sn*cy), F:cy-(sn*cx + cs*cy) };
+  }
+  affRotateAbout(cx, cy, deg){
+    const th = deg * Math.PI/180, cs = Math.cos(th), sn = Math.sin(th);
+    return { A:cs, B:-sn, C:sn, D:cs, E:cx-(cs*cx - sn*cy), F:cy-(sn*cx + cs*cy) };
+  }
+  gSetup(id){
+    const c = document.getElementById(id); if(!c) return null;
+    const cw = c.clientWidth || 200, ch = c.clientHeight || 184;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(cw*dpr); c.height = Math.round(ch*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+    return { ctx, W:c.width, H:c.height, dpr };
+  }
+  gAxes(g, R, primed){
+    const { ctx, W, H, dpr } = g;
+    const s = Math.min(W/(2*R), H/(2*R)) * 0.9;
+    const ox = W/2, oy = H/2;
+    const toPx = (x,y) => [ox + s*x, oy - s*y];
+    const iX = Math.floor((W/2)/s), iY = Math.floor((H/2)/s);
+    ctx.lineWidth = 1*dpr; ctx.strokeStyle = '#eee';
+    for(let i=-iX;i<=iX;i++){ const px = ox + s*i; ctx.beginPath(); ctx.moveTo(px,0); ctx.lineTo(px,H); ctx.stroke(); }
+    for(let i=-iY;i<=iY;i++){ const py = oy - s*i; ctx.beginPath(); ctx.moveTo(0,py); ctx.lineTo(W,py); ctx.stroke(); }
+    ctx.strokeStyle = '#9a9aa0'; ctx.lineWidth = 1.4*dpr;
+    ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke();
+    ctx.fillStyle = '#9a9aa0'; const ah = 5*dpr;
+    ctx.beginPath(); ctx.moveTo(W-1,oy); ctx.lineTo(W-1-ah*1.7,oy-ah); ctx.lineTo(W-1-ah*1.7,oy+ah); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(ox,1); ctx.lineTo(ox-ah,1+ah*1.7); ctx.lineTo(ox+ah,1+ah*1.7); ctx.fill();
+    const step = R <= 5 ? 1 : 2;
+    ctx.fillStyle = '#b0b0b6'; ctx.font = (8.5*dpr)+"px 'JetBrains Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for(let i=-iX;i<=iX;i++){ if(i===0 || i%step!==0) continue; ctx.fillText(String(i), ox + s*i, oy + 3*dpr); }
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for(let i=-iY;i<=iY;i++){ if(i===0 || i%step!==0) continue; ctx.fillText(String(i), ox - 4*dpr, oy - s*i); }
+    ctx.fillStyle = '#56565c'; ctx.font = 'italic '+(10*dpr)+"px 'Helvetica Neue', sans-serif";
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('O', ox - 3*dpr, oy + 2*dpr);
+    ctx.fillStyle = '#141416'; ctx.font = 'italic '+(11.5*dpr)+"px 'Helvetica Neue', sans-serif";
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText(primed?'x′':'x', W - 4*dpr, oy + 4*dpr);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(primed?'y′':'y', ox + 5*dpr, 3*dpr);
+    return toPx;
+  }
+  gPolyPlane(id, q, aff, primed){
+    const g = this.gSetup(id); if(!g) return;
+    const toPx = this.gAxes(g, q.R, primed);
+    const { ctx, dpr } = g;
+    const pts = this.GFIG.map(([x,y]) => { const [X,Y] = this.applyAff(aff,x,y); return toPx(X,Y); });
+    ctx.beginPath(); pts.forEach((p,i) => i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1])); ctx.closePath();
+    ctx.fillStyle = primed ? 'rgba(224,65,28,0.16)' : 'rgba(42,111,219,0.15)'; ctx.fill();
+    ctx.lineWidth = 2*dpr; ctx.lineJoin = 'round'; ctx.strokeStyle = primed ? '#e0411c' : '#2a6fdb'; ctx.stroke();
+    ctx.fillStyle = primed ? '#e0411c' : '#2a6fdb';
+    pts.forEach(p => { ctx.beginPath(); ctx.arc(p[0],p[1],2.4*dpr,0,7); ctx.fill(); });
+  }
+  gPhotoPlane(id, q, aff, primed){
+    const g = this.gSetup(id); if(!g) return;
+    const toPx = this.gAxes(g, q.R, primed);
+    const { ctx, dpr } = g;
+    const img = this.imgs[q.src]; if(!img) return;
+    const r = q.region;
+    const corner = (u,v) => { const mx = r.x0 + u*(r.x1-r.x0), my = r.y1 - v*(r.y1-r.y0); const [X,Y] = this.applyAff(aff,mx,my); return toPx(X,Y); };
+    const P00 = corner(0,0), P10 = corner(1,0), P01 = corner(0,1), P11 = corner(1,1);
+    const iw = img.width, ih = img.height;
+    const a = (P10[0]-P00[0])/iw, b = (P10[1]-P00[1])/iw, cc = (P01[0]-P00[0])/ih, d = (P01[1]-P00[1])/ih;
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(P00[0],P00[1]); ctx.lineTo(P10[0],P10[1]); ctx.lineTo(P11[0],P11[1]); ctx.lineTo(P01[0],P01[1]); ctx.closePath();
+    ctx.clip();
+    ctx.setTransform(a,b,cc,d,P00[0],P00[1]);
+    ctx.drawImage(img,0,0);
+    ctx.restore();
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.beginPath(); ctx.moveTo(P00[0],P00[1]); ctx.lineTo(P10[0],P10[1]); ctx.lineTo(P11[0],P11[1]); ctx.lineTo(P01[0],P01[1]); ctx.closePath();
+    ctx.lineWidth = 1.6*dpr; ctx.strokeStyle = primed ? '#e0411c' : '#2a6fdb'; ctx.stroke();
+  }
+  drawGeometric(q){
+    const ID = {A:1,B:0,C:0,D:1,E:0,F:0};
+    if(q.gkind === 'mat2fig'){
+      this.gPhotoPlane('g-before', q, ID, false);
+      const cx = (q.region.x0 + q.region.x1)/2, cy = (q.region.y0 + q.region.y1)/2;
+      q.choices.forEach((ch,i) => {
+        const aff = (ch.rotCenterDeg !== undefined) ? this.affRotateAbout(cx, cy, ch.rotCenterDeg) : this.affFromMat(ch.matrix);
+        this.gPhotoPlane('q-choice-'+i, q, aff, true);
+      });
+    } else if(q.gkind === 'fig2eq'){
+      this.gPolyPlane('g-before', q, ID, false);
+      this.gPolyPlane('g-after', q, q.transform, true);
+    } else if(q.gkind === 'fig2mat'){
+      this.gPolyPlane('g-before', q, ID, false);
+      this.gPolyPlane('g-after', q, this.affFromMat(q.matrix), true);
+    } else if(q.gkind === 'affine'){
+      this.gPhotoPlane('g-before', q, ID, false);
+      this.gPhotoPlane('g-after', q, this.affRotateAboutCenter(q, -1), true);
+    } else if(q.gkind === 'fig2mprod'){
+      this.gPhotoPlane('g-before', q, ID, false);
+      this.gPhotoPlane('g-after', q, q.aff, true);
+    } else if(q.gkind === 'compose3'){
+      q.stages.forEach((st, i) => this.gPhotoPlane('g-c' + (i + 1), q, st.aff, i > 0));
+    }
+  }
+
+  // ---------- math typesetting (matrices / equations) ----------
+  mFrac(num, den){
+    const h = React.createElement;
+    return h('span',{style:{display:'inline-flex',flexDirection:'column',alignItems:'center',verticalAlign:'middle',lineHeight:1.05,margin:'0 1px'}},
+      h('span',{style:{padding:'0 3px',fontSize:'0.86em'}}, num),
+      h('span',{style:{width:'100%',borderTop:'1.3px solid currentColor',height:0}}),
+      h('span',{style:{padding:'0 3px',fontSize:'0.86em'}}, den));
+  }
+  mEntry(v){
+    const h = React.createElement;
+    let s = String(v).replace(/-/g,'−');
+    if(s.indexOf('/') >= 0){
+      let neg = false; if(s[0]==='−'){ neg = true; s = s.slice(1); }
+      const parts = s.split('/');
+      const fr = this.mFrac(parts[0], parts[1]);
+      return neg ? h('span',{style:{display:'inline-flex',alignItems:'center'}}, '−', fr) : fr;
+    }
+    return h('span', null, s);
+  }
+  mBracket(left){
+    const h = React.createElement;
+    const st = {display:'inline-block', width:'5px', alignSelf:'stretch', borderTop:'1.5px solid #1a1a1c', borderBottom:'1.5px solid #1a1a1c'};
+    st[left ? 'borderLeft' : 'borderRight'] = '1.5px solid #1a1a1c';
+    return h('span',{style:st});
+  }
+  mMatrix(rows, gap){
+    const h = React.createElement;
+    const cols = rows[0].length, cells = [];
+    rows.forEach(r => r.forEach(v => cells.push(h('span',{style:{display:'flex',alignItems:'center',justifyContent:'center'}}, this.mEntry(v)))));
+    const grid = h('span',{style:{display:'inline-grid', gridTemplateColumns:'repeat('+cols+',auto)', columnGap:(gap||12)+'px', rowGap:'5px', padding:'3px 5px', alignItems:'center'}}, ...cells);
+    return h('span',{style:{display:'inline-flex', alignItems:'stretch', verticalAlign:'middle'}}, this.mBracket(true), grid, this.mBracket(false));
+  }
+  mLinear(co){
+    const t = [];
+    const push = (c, v) => { if(c===0) return; const sign = c<0 ? '−' : '+'; const mag = Math.abs(c); const term = v ? (mag===1?'':mag)+v : String(mag); t.push({sign, term}); };
+    push(co[0],'x'); push(co[1],'y'); push(co[2],'');
+    if(t.length===0) return '0';
+    let str = t[0].sign==='−' ? '−'+t[0].term : t[0].term;
+    for(let i=1;i<t.length;i++) str += ' '+t[i].sign+' '+t[i].term;
+    return str;
+  }
+  mEqSystem(eq){
+    const h = React.createElement;
+    const lines = h('span',{style:{display:'inline-flex',flexDirection:'column',gap:'8px',fontFamily:"'JetBrains Mono', monospace",fontSize:'14px',color:'#141416'}},
+      h('span', null, 'x′ = ' + this.mLinear([eq.A, eq.B, eq.E])),
+      h('span', null, 'y′ = ' + this.mLinear([eq.C, eq.D, eq.F])));
+    return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px'}},
+      h('span',{style:{fontSize:'42px',fontWeight:200,lineHeight:1,color:'#1a1a1c'}}, '{'), lines);
+  }
+  mMatEq(disp){
+    const h = React.createElement;
+    return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'6px',fontFamily:"'Helvetica Neue',sans-serif",fontSize:'15px',color:'#141416'}},
+      this.mMatrix([['x′'],['y′']]), h('span', null, '='), this.mMatrix(disp), this.mMatrix([['x'],['y']]));
+  }
+  mMatProd(mats){
+    const h = React.createElement;
+    return h('span',{style:{display:'inline-flex',alignItems:'center',gap:'5px',flexWrap:'nowrap',fontSize:'14px'}},
+      ...mats.map(m => this.mMatrix(m, 9)));
+  }
+  mThreshLabel(circ, val){
+    const h = React.createElement;
+    return h('span',{style:{display:'inline-flex',flexDirection:'column',alignItems:'center',gap:'4px'}},
+      h('span',{style:{fontSize:'34px',fontWeight:800,lineHeight:1,color:'#141416'}}, circ),
+      h('span',{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:'12px',color:'#56565c'}}, 'しきい値 ≈ '+val));
+  }
+  mMatchRow(map){
+    const h = React.createElement;
+    const figs = ['図5','図6','図7'];
+    return h('span',{style:{display:'inline-flex',gap:'26px',flexWrap:'wrap',justifyContent:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:'15px',color:'#141416'}},
+      ...map.map((m,i)=>h('span',{key:i,style:{display:'inline-flex',alignItems:'center',gap:'7px'}},
+        h('span',{style:{color:'#56565c'}}, figs[i]),
+        h('span',{style:{color:'#e0411c',fontWeight:700}}, '→'),
+        h('strong',{style:{fontWeight:800}}, m))));
+  }
+
+  // ---------- fourier transform (power spectrum) ----------
+  patternGray(key, N) {
+    if (key === 'hex') { const sq = this.getSquareGray('blue_kikagaku', N); return sq ? sq.gray : null; }
+    if (key === 'metal') { const sq = this.getSquareGray('metal', N); return sq ? sq.gray : null; }
+    if (key === 'fence') { const sq = this.getSquareGray('fence', N); return sq ? sq.gray : null; }
+    if (key === 'pebbles') { const sq = this.getSquareGray('pebbles', N); return sq ? sq.gray : null; }
+    if (key === 'shapes') { const sq = this.getSquareGray('shapes', N); return sq ? sq.gray : null; }
+    const g = new Float64Array(N * N);
+    const T = Math.PI * 2;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = y * N + x; let v = 128;
+      switch (key) {
+        case 'vstripe':    v = 128 + 120 * Math.cos(T * 16 * x / N); break;
+        case 'hstripe':    v = 128 + 120 * Math.cos(T * 16 * y / N); break;
+        case 'dstripe':    v = 128 + 120 * Math.cos(T * 16 * (x + y) / N); break;
+        case 'd135':       v = 128 + 120 * Math.cos(T * 16 * (x - y) / N); break;
+        case 'cross':      v = 128 + 60 * Math.cos(T * 14 * x / N) + 60 * Math.cos(T * 14 * y / N); break;
+        case 'checker':    v = 128 + 120 * Math.cos(T * 14 * x / N) * Math.cos(T * 14 * y / N); break;
+        case 'concentric': { const dx = x - N / 2, dy = y - N / 2, r = Math.sqrt(dx * dx + dy * dy); v = 128 + 120 * Math.cos(T * r / 12); break; }
+      }
+      g[i] = v < 0 ? 0 : v > 255 ? 255 : v;
+    }
+    return g;
+  }
+  patternSourceImage(key, N) {
+    const g = this.patternGray(key, N);
+    if (!g) return null;
+    const out = new Uint8ClampedArray(N * N * 4);
+    for (let i = 0; i < N * N; i++) { const v = g[i], o = i * 4; out[o] = out[o + 1] = out[o + 2] = v; out[o + 3] = 255; }
+    return new ImageData(out, N, N);
+  }
+  powerSpectrumImage(key, N) {
+    this.psCache = this.psCache || {};
+    const ck = 'ps_' + key + '_' + N;
+    if (this.psCache[ck]) return this.psCache[ck];
+    const gray = this.patternGray(key, N);
+    if (!gray) return null;
+    const re = new Float64Array(gray), im = new Float64Array(N * N);
+    this.fft2d(re, im, N, false);
+    const mags = new Float64Array(N * N);
+    let max = 1e-9;
+    for (let i = 0; i < N * N; i++) { const m = Math.log(1 + Math.hypot(re[i], im[i])); mags[i] = m; }
+    // Normalize against the strongest NON-DC frequency: the DC spike (and its
+    // immediate low-freq neighbours) is enormous for real photos and otherwise
+    // swamps the scale, washing every meaningful peak to flat gray. Excluding a
+    // small central window lets directional streaks / periodic lattice peaks show.
+    const DCR = 3;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const fx = Math.min(x, N - x), fy = Math.min(y, N - y);
+      if (fx <= DCR && fy <= DCR) continue;
+      const m = mags[y * N + x];
+      if (m > max) max = m;
+    }
+    // centered (fftshift) + gamma-boosted values
+    const half = N / 2;
+    const valg = new Float64Array(N * N);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const sy = (y + half) % N, sx = (x + half) % N;
+      const norm = Math.min(1, mags[sy * N + sx] / max);
+      valg[y * N + x] = Math.pow(norm, 0.7) * 255;
+    }
+    // 3x3 max-dilation so isolated peaks stay visible after downscaling
+    const out = new Uint8ClampedArray(N * N * 4);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      let m = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const ny = y + dy, nx = x + dx;
+        if (ny < 0 || ny >= N || nx < 0 || nx >= N) continue;
+        const vv = valg[ny * N + nx]; if (vv > m) m = vv;
+      }
+      const v = m > 255 ? 255 : m, o = (y * N + x) * 4;
+      out[o] = out[o + 1] = out[o + 2] = v; out[o + 3] = 255;
+    }
+    const id = new ImageData(out, N, N);
+    this.psCache[ck] = id;
+    return id;
+  }
+  drawFourier(q) {
+    const N = 256;
+    if (q.src) {
+      const base = this.getSource(q.src, 256, 150);
+      if (base) this.putToCanvas('q-source', base);
+    } else {
+      this.putSquareCover('q-source', this.patternSourceImage(q.srcPattern, N), N);
+    }
+    q.choices.forEach((ch, i) => { this.putSquareCover('q-choice-' + i, this.powerSpectrumImage(ch.pattern, N), N); });
+  }
+
+  drawFrequency(q) {
+    const N = 256;
+    const sq = this.getSquareGray(q.src, N);
+    if (!sq) return;
+    this.putSquareCover('q-source', sq.imageData, N);
+    const spec = this.forwardFFT(q.src, N, sq.gray);
+    this.drawFilterPreview('q-filter', q.choices[q.answer].params);
+    q.choices.forEach((ch, i) => { this.putSquareCover('q-choice-' + i, this.freqResult(q.src, ch.params, N, spec), N); });
+  }
+
+  // ---------- handlers ----------
+  handleStart() {
+    const id = this.state.selectedCategory;
+    const session = id === 'all' ? this.QUIZZES.slice() : this.QUIZZES.filter(q => q.cat === id);
+    this.setState({ session, screen: 'quiz', index: 0, score: 0, selected: null });
+  }
+  handleSelect(i) {
+    if (this.state.selected != null) return;
+    const q = this.state.session[this.state.index];
+    this.setState(s => ({ selected: i, score: s.score + (i === q.answer ? 1 : 0) }));
+  }
+  handleNext() {
+    const s = this.state;
+    if (s.index + 1 >= s.session.length) this.setState({ screen: 'result' });
+    else this.setState({ index: s.index + 1, selected: null });
+  }
+  setCell(r, c, val) {
+    const num = parseFloat(val);
+    const k = this.state.pgKernel.map(row => row.slice());
+    k[r][c] = isNaN(num) ? 0 : num;
+    this.setState({ pgKernel: k });
+  }
+  applyPreset(p) {
+    this.setState({ pgKernel: p.kernel.map(r => r.slice()), pgScale: p.scale, pgScaleInput: p.scaleLabel });
+  }
+  onScaleChange(val) {
+    let num;
+    if (val.indexOf('/') >= 0) { const a = val.split('/'); num = parseFloat(a[0]) / parseFloat(a[1]); }
+    else num = parseFloat(val);
+    this.setState({ pgScaleInput: val, pgScale: (!isNaN(num) && num !== 0) ? num : this.state.pgScale });
+  }
+  kernelEq(a, b) {
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) if (a[r][c] !== b[r][c]) return false;
+    return true;
+  }
+
+  kernelName(k) {
+    const map = [[this.K.box,'移動平均（ぼかし）'],[this.K.gaussian,'ガウシアンぼかし'],[this.K.sharpen,'鮮鋭化'],[this.K.edge,'エッジ強調'],[this.K.laplacian,'ラプラシアン（エッジ検出）'],[this.K.sobelX,'Sobel X（縦エッジ検出）'],[this.K.sobelY,'Sobel Y（横エッジ検出）'],[this.K.emboss,'エンボス（浮き彫り）'],[this.K.strongSharpen,'強い鮮鋭化'],[this.K.identity,'恒等変換（変化なし）']];
+    for (const [ref, name] of map) if (ref === k) return name;
+    return 'カーネル';
+  }
+  curveName(c) {
+    const map = [[this.CV.brighten,'明るく'],[this.CV.invert,'ネガポジ反転'],[this.CV.darken,'暗く'],[this.CV.scontrast,'S字カーブで高コントラスト化'],[this.CV.lowcontrast,'低コントラスト化（眠く）'],[this.CV.liftShadows,'シャドウを持ち上げ（黒を浮かせる）'],[this.CV.crushBlacks,'シャドウを締める（黒を沈める）'],[this.CV.solarize,'ソラリゼーション（山型カーブ）'],[this.CV.identity,'恒等（無変換）']];
+    for (const [ref, name] of map) if (ref === c) return name;
+    return 'トーンカーブ適用';
+  }
+  curveDesc(c) {
+    const map = [
+      [this.CV.brighten,'右上に凸 — 全体を明るく持ち上げる'],
+      [this.CV.darken,'右下がりの直線 — 全体を暗く'],
+      [this.CV.invert,'右下がりの対角線 — 明暗を反転（ネガ）'],
+      [this.CV.scontrast,'S字 — 暗部を沈め明部を伸ばし高コントラスト'],
+      [this.CV.lowcontrast,'出力を中央に圧縮 — 低コントラスト（眠い）'],
+      [this.CV.liftShadows,'左端（黒）を持ち上げ — シャドウが灰色に浮く'],
+      [this.CV.crushBlacks,'暗部を急に沈める — 黒が締まる'],
+      [this.CV.solarize,'山型（上がって下がる）— ソラリゼーション'],
+      [this.CV.identity,'対角の直線 — 何も変化しない恒等カーブ'],
+    ];
+    for (const [ref, name] of map) if (ref === c) return name;
+    return 'トーンカーブ';
+  }
+  chanName(ch) { return { r:'Rチャンネルのみ', g:'Gチャンネルのみ', b:'Bチャンネルのみ', rgb:'全チャンネル' }[ch] || ''; }
+  describeChoice(ch) {
+    if (ch.note) return ch.note;
+    if (ch.kind === 'curve') return this.curveDesc(ch.curvePoints);
+    const p = ch.params;
+    switch (ch.fn) {
+      case 'applyToneCurve':
+        return this.chanName(p.channel) + 'を' + this.curveName(p.curvePoints);
+      case 'applyKernel': return this.kernelName(p.kernel);
+      case 'applyThreshold':
+        if (p.gray) return 'グレースケール化（2値化なし）';
+        if (p.threshold === 'otsu') return '大津の二値化' + (p.invert ? '（白黒反転）' : '（自動しきい値）');
+        return 'しきい値 ' + p.threshold + ' で二値化';
+      case 'applyGeometric': {
+        const g = p;
+        if (g.type === 'rotate') return g.deg + '° 回転';
+        if (g.type === 'scale') return g.sx >= 1 ? g.sx + '倍に拡大' : g.sx + '倍に縮小';
+        if (g.type === 'flip') return g.axis === 'h' ? '左右反転（鏡像）' : '上下反転';
+        if (g.type === 'translate') return '平行移動';
+      }
+      case 'applyFrequency': {
+        const f = p;
+        if (f.type === 'lowpass') return f.sigma >= 80 ? 'ローパス（弱め＝ほぼ元画像）' : 'ローパス（低周波通過＝ぼかし）';
+        if (f.type === 'highpass') return 'ハイパス（高周波通過＝輪郭抽出）';
+        if (f.type === 'bandpass') return 'バンドパス（中間周波数のみ通過）';
+        if (f.type === 'directional') return '方向性フィルタ（' + f.angle + '°方向の周波数を通過）';
+      }
+      case 'fourier': return this.spectrumName(ch.pattern);
+    }
+    return '';
+  }
+  spectrumName(key) {
+    return {
+      vstripe:    '縦縞のスペクトル（中心の左右に1対の輝点）',
+      hstripe:    '横縞のスペクトル（中心の上下に1対の輝点）',
+      dstripe:    '斜め縞(45°)のスペクトル（対角線上に1対の輝点）',
+      d135:       '斜め縞(135°)のスペクトル（逆対角線上に1対の輝点）',
+      fence:      '菱形メッシュのスペクトル（斜め2方向に×字状）',
+      metal:      'ヘアラインのスペクトル（中心を通る一本の筋）',
+      cross:      '縦横格子のスペクトル（＋字状に4輝点）',
+      checker:    '市松模様のスペクトル（×字状に4輝点）',
+      concentric: '同心円のスペクトル（リング状）',
+      hex:        '六角形パターンのスペクトル（六方配置の輝点群）',
+      pebbles:    '小石テクスチャの振幅スペクトル（中心に集中した拡散状）',
+      shapes:     '幾何学的な図形画像の振幅スペクトル（エッジ由来の十字状構造）',
+    }[key] || '';
+  }
+  catLabel(id) { return this.CATEN[id] || ''; }
+  message(rate) {
+    if (rate >= 0.8) return '🎉 素晴らしい！画像処理の基礎をしっかり理解しています。';
+    if (rate >= 0.6) return '👍 よくできました！苦手な問題を復習してみましょう。';
+    return '📚 もう少し！解説を読み返して再チャレンジしてみましょう。';
+  }
+
+  renderVals() {
+    const st = this.state;
+    const all = this.QUIZZES;
+
+    // categories
+    const categories = this.CATS.map((c, i) => {
+      const sel = st.selectedCategory === c.id;
+      const count = c.id === 'all' ? all.length : all.filter(q => q.cat === c.id).length;
+      const last = i === this.CATS.length - 1;
+      return {
+        num: String(i).padStart(2, '0'),
+        label: c.label,
+        count: String(count).padStart(2, '0'),
+        onClick: () => this.setState({ selectedCategory: c.id }),
+        rowStyle: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 8px', borderBottom: last ? '1.5px solid #1a1a1c' : '1px solid #e2e0da', cursor:'pointer', background: sel ? '#fff5f1' : 'transparent' },
+        numStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', color: sel ? '#e0411c' : '#bdbdc2', fontWeight: sel ? 700 : 400 },
+        labelStyle: { fontSize:'14px', color: sel ? '#141416' : '#3a3a40', fontWeight: sel ? 700 : 500 },
+        countStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', color: sel ? '#e0411c' : '#9a9aa0', fontWeight: sel ? 700 : 400 },
+      };
+    });
+
+    // quiz
+    const q = st.session[st.index];
+    const answered = st.selected != null;
+    const total = st.session.length;
+    const isGeo = !!q && q.cat === 'geometric';
+    const isToneId = !!q && q.cat === 'toneCurve' && q.tckind === 'img2curve';
+    const isHistQ = !!q && q.cat === 'threshold' && q.thkind === 'hist';
+    const isHistMatch = !!q && q.cat === 'threshold' && q.thkind === 'histmatch';
+    const wide = isGeo && (q.gkind === 'affine' || q.gkind === 'compose3' || q.gkind === 'fig2mprod');
+    const cols = (wide || isHistMatch) ? 1 : 2;
+    const nCh = q ? q.choices.length : 4;
+    const choices = q ? q.choices.map((ch, i) => {
+      const correct = i === q.answer;
+      const sel = st.selected === i;
+      const isMath = ch.kind === 'eq' || ch.kind === 'mat' || ch.kind === 'mprod' || ch.kind === 'thresh' || ch.kind === 'match';
+      const lastCol = (i % cols === cols - 1);
+      const lastRow = (i >= nCh - cols);
+      const cellStyle = {
+        position:'relative', overflow:'hidden', cursor: answered ? 'default' : 'pointer',
+        background: isMath ? '#fff' : 'transparent',
+        borderRight: lastCol ? 'none' : '1.5px solid #1a1a1c',
+        borderBottom: lastRow ? 'none' : '1.5px solid #1a1a1c',
+      };
+      if (answered && correct) { cellStyle.outline = '3px solid #1f9d57'; cellStyle.outlineOffset = '-3px'; }
+      else if (answered && sel) { cellStyle.outline = '3px solid #1a1a1c'; cellStyle.outlineOffset = '-3px'; }
+      let mathEl = null;
+      if (ch.kind === 'eq') mathEl = this.mEqSystem(ch.eq);
+      else if (ch.kind === 'mat') mathEl = this.mMatrix(ch.disp);
+      else if (ch.kind === 'mprod') mathEl = this.mMatProd(ch.mats);
+      else if (ch.kind === 'thresh') mathEl = this.mThreshLabel(['①','②','③','④'][ch.mark], q.marks[ch.mark]);
+      else if (ch.kind === 'match') mathEl = this.mMatchRow(ch.map);
+      return {
+        idx: i, label: ch.label,
+        onClick: () => this.handleSelect(i),
+        cellStyle,
+        isCanvas: !isMath,
+        isMath,
+        canvasStyle: isGeo
+          ? { display:'block', width:'100%', aspectRatio:'1 / 1', background:'#fff' }
+          : isToneId
+          ? { display:'block', width:'100%', aspectRatio:'1 / 1', background:'#fff' }
+          : { display:'block', width:'100%', height:'150px', background:'#e9e7e1' },
+        mathEl,
+        mathCellStyle: { display:'flex', alignItems:'center', justifyContent:'center', minHeight: isHistMatch ? '52px' : '120px', padding: isHistMatch ? '15px 14px' : (wide ? '20px 14px' : '16px 12px'), overflowX:'auto' },
+        showCorrect: answered && correct,
+        showWrong: answered && sel && !correct,
+      };
+    }) : [];
+    const choiceGridStyle = { display:'grid', gridTemplateColumns: cols === 1 ? '1fr' : '1fr 1fr', gap:'0', border:'1.5px solid #1a1a1c' };
+    // geometric source area
+    const geoShowMatrix = isGeo && q.gkind === 'mat2fig';
+    const geoCompose3 = isGeo && q.gkind === 'compose3';
+    const geoShowStages = isGeo && q.gkind !== 'compose3';
+    const geoStages = geoCompose3 ? q.stages.map((s, i) => ({
+      idx: i + 1,
+      label: s.label,
+      showArrow: i < q.stages.length - 1,
+      arrowLabel: (q.stages[i + 1] && q.stages[i + 1].arrowLabel) || '',
+    })) : [];
+    const geoShowAfter = isGeo && (q.gkind === 'fig2eq' || q.gkind === 'fig2mat' || q.gkind === 'affine' || q.gkind === 'fig2mprod');
+    const geoBeforeLabel = isGeo ? (q.gkind === 'mat2fig' || q.gkind === 'affine' || q.gkind === 'fig2mprod' ? '原画像 — 変換前' : '図形 — 変換前') : '';
+    const geoAfterLabel = isGeo ? (q.gkind === 'fig2eq' || q.gkind === 'fig2mat' ? '図形′ — 変換後' : '画像′ — 変換後') : '';
+    const matrixEl = geoShowMatrix ? this.mMatEq(q.choices[q.answer].disp) : null;
+
+    const choiceDescs = q ? q.choices.map((ch, i) => {
+      const correct = i === q.answer;
+      return {
+        label: ch.label,
+        text: this.describeChoice(ch),
+        labelStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'11px', fontWeight:700, color:'#fff', background: correct ? '#e0411c' : '#1a1a1c', padding:'1px 7px', flexShrink:0, lineHeight:'1.5' },
+        textStyle: { fontSize:'12.5px', lineHeight:'1.5', color: correct ? '#b3300f' : '#3a3a40', fontWeight: correct ? 700 : 500 },
+      };
+    }) : [];
+
+    // kernel display for kernel-filter questions
+    const isKernelQ = !!q && q.cat === 'kernel';
+    let kernelCells = [], kernelScaleLabel = '';
+    if (isKernelQ) {
+      const cp = q.choices[q.answer].params;
+      const flat = cp.kernel.flat();
+      kernelCells = flat.map((v, i) => {
+        const lastCol = (i % 3 === 2), lastRow = (i >= 6), center = (i === 4);
+        return {
+          v: v,
+          style: { height:'46px', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'JetBrains Mono',monospace", fontSize:'15px', borderRight: lastCol ? 'none' : '1px solid #e2e0da', borderBottom: lastRow ? 'none' : '1px solid #e2e0da', fontWeight: center ? 700 : 400, background: center ? '#fff5f1' : 'transparent', color: center ? '#b3300f' : (v < 0 ? '#e0411c' : '#3a3a40') },
+        };
+      });
+      const s = cp.scale == null ? 1 : cp.scale;
+      kernelScaleLabel = s === 1 ? '×1' : (Math.abs(s - 1/9) < 1e-9 ? '×1/9' : (Math.abs(s - 1/16) < 1e-9 ? '×1/16' : '×' + s));
+    }
+
+    // tone-curve graph for tone-curve questions
+    const isCurveQ = !!q && q.cat === 'toneCurve' && q.tckind !== 'img2curve';
+    let curvePath = '', curveChannelLabel = '';
+    if (isCurveQ) {
+      const cp = q.choices[q.answer].params;
+      const lut = this.buildLUT(cp.curvePoints);
+      const pts = [];
+      for (let x = 0; x <= 255; x += 5) {
+        const px = (x / 255) * 150;
+        const py = 150 - (lut[x] / 255) * 150;
+        pts.push(px.toFixed(1) + ',' + py.toFixed(1));
+      }
+      curvePath = pts.join(' ');
+      curveChannelLabel = this.chanName(cp.channel);
+    }
+
+    const isCorrect = answered && q && st.selected === q.answer;
+    const verdictStyle = {
+      display:'inline-block', fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', fontWeight:700, letterSpacing:'0.08em',
+      padding:'5px 12px', color:'#fff', background: isCorrect ? '#1f9d57' : '#d23a3a',
+    };
+    const pct = total ? ((st.index + (answered ? 1 : 0)) / total) * 100 : 0;
+
+    // result
+    const score = st.score;
+    const rate = total ? score / total : 0;
+    const percent = Math.round(rate * 100);
+    const resultCat = this.CATS.find(c => c.id === st.selectedCategory);
+
+    // playground
+    const pgImages = this.IMG_OPTS.map(o => {
+      const sel = st.pgImage === o.value;
+      return {
+        label: o.label,
+        onClick: () => this.setState({ pgImage: o.value }),
+        style: { fontSize:'12px', padding:'6px 12px', cursor:'pointer', border: sel ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: sel ? '#fff5f1' : '#fcfbf8', color: sel ? '#b3300f' : '#56565c', fontWeight: sel ? 700 : 400 },
+      };
+    });
+    // threshold playground white/black ratio
+    let thWhitePct = '0';
+    if (st.screen === 'threshold') {
+      const tb = this.getSource(st.thImage, 236, 184);
+      if (tb) {
+        const d = tb.data; let w = 0, tot = 0;
+        for (let i=0;i<d.length;i+=4){ const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; let white = g >= st.thValue; if (st.thInvert) white = !white; if (white) w++; tot++; }
+        thWhitePct = ((100*w)/tot).toFixed(0);
+      }
+    }
+    const gpR = st.gpMatR, gpMm = st.gpMatM;
+    const gpN = (s) => { const v = parseFloat(s); return isFinite(v) ? v : 0; };
+    const gpComp = this.mat3mul(this.gpToNumMat(gpR), this.gpToNumMat(gpMm));
+    const gpDet = gpComp[0][0] * gpComp[1][1] - gpComp[0][1] * gpComp[1][0];
+    const pgCells = [];
+    st.pgKernel.forEach((row, r) => row.forEach((v, c) => {
+      pgCells.push({ v, onChange: (e) => this.setCell(r, c, e.target.value) });
+    }));
+    const sum = st.pgKernel.flat().reduce((a, b) => a + b, 0);
+    const pgPresets = this.PRESETS.map((p, i) => {
+      const sel = this.kernelEq(p.kernel, st.pgKernel) && Math.abs(p.scale - st.pgScale) < 1e-9;
+      const lastCol = (i % 4 === 3);
+      const lastRow = (i >= 4);
+      return {
+        num: String(i + 1).padStart(2, '0'),
+        label: p.label,
+        onClick: () => this.applyPreset(p),
+        numStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color: sel ? '#e0411c' : '#bdbdc2' },
+        style: { padding:'11px 12px', fontSize:'12.5px', cursor:'pointer', color: sel ? '#b3300f' : '#3a3a40', fontWeight: sel ? 700 : 400, background: sel ? '#fff5f1' : 'transparent', borderRight: lastCol ? 'none' : '1px solid #e2e0da', borderBottom: lastRow ? 'none' : '1px solid #e2e0da' },
+      };
+    });
+
+    return {
+      isStart: st.screen === 'start',
+      isQuiz: st.screen === 'quiz',
+      isResult: st.screen === 'result',
+      isPlayground: st.screen === 'playground',
+      isFourier: st.screen === 'fourier',
+      isThreshold: st.screen === 'threshold',
+      isTonePG: st.screen === 'tonepg',
+      isGeoPG: st.screen === 'geopg',
+
+      categories,
+      onStart: () => this.handleStart(),
+      onPlayground: () => this.setState({ screen: 'playground' }),
+
+      qNumber: String(st.index + 1).padStart(2, '0'),
+      qTotal: String(total).padStart(2, '0'),
+      qCatLabel: q ? this.catLabel(q.cat) : '',
+      qPre: isKernelQ ? '以下のカーネル（3×3）でフィルタを適用した結果はどれ？'
+            : isCurveQ ? '' : (q ? q.pre : ''),
+      qHi: isKernelQ ? '' : isCurveQ ? curveChannelLabel : (q ? q.hi : ''),
+      qPost: isKernelQ ? '' : isCurveQ ? 'に以下のトーンカーブを適用した結果はどれ？' : (q ? q.post : ''),
+      showKernel: isKernelQ,
+      kernelCells,
+      kernelScaleLabel,
+      showCurve: isCurveQ,
+      curvePath,
+      showFilter: !!q && q.cat === 'frequency',
+      showSpectrumInfo: !!q && q.cat === 'fourier',
+      showStdSource: !!q && !isGeo && !isToneId && !isHistQ && !isHistMatch,
+      showResult: isToneId,
+      isGeo,
+      isToneId,
+      isHistQ,
+      isHistMatch,
+      hmImgs: isHistMatch ? (q.imgSrcs || []).map((s, i) => ({ idx: i, label: ['図5','図6','図7'][i] })) : [],
+      hmHists: isHistMatch ? (q.histSrcs || []).map((s, i) => ({ idx: i, label: ['図8','図9','図10'][i] })) : [],
+      geoShowMatrix,
+      geoCompose3,
+      geoShowStages,
+      geoStages,
+      geoShowAfter,
+      geoBeforeLabel,
+      geoAfterLabel,
+      matrixEl,
+      choiceGridStyle,
+      progressStyle: { width: pct + '%', height: '100%', background: '#e0411c', transition: 'width .3s ease' },
+      progressSegments: (st.session || []).map((qq, i) => {
+        const done = i < st.index || (i === st.index && answered);
+        const current = i === st.index;
+        return {
+          title: '問題 ' + (i + 1) + ' へ',
+          onClick: () => { if (i !== st.index) this.setState({ index: i, selected: null }); },
+          style: {
+            flex: 1,
+            height: '100%',
+            background: current ? '#1a1a1c' : (done ? '#e0411c' : '#d8d5ce'),
+            cursor: 'pointer',
+            transition: 'background .2s ease',
+          },
+        };
+      }),
+      choices,
+      notAnswered: !answered,
+      answered,
+      verdictStyle,
+      verdictText: isCorrect ? '正解' : '不正解',
+      explanation: q ? q.explanation : '',
+      choiceDescs,
+      nextLabel: (st.index + 1 >= total) ? '結果を見る →' : '次の問題へ →',
+      onNext: () => this.handleNext(),
+      onQuit: () => this.setState({ screen: 'start' }),
+
+      score, total, percent,
+      percentStyle: { color: rate >= 0.8 ? '#1f9d57' : rate >= 0.6 ? '#d97706' : '#d23a3a', fontWeight: 700 },
+      resultBarStyle: { width: percent + '%', height: '100%', background: '#e0411c' },
+      message: this.message(rate),
+      resultCatLabel: resultCat ? resultCat.label + '（' + total + '問）' : '',
+      onRetry: () => this.handleStart(),
+
+      pgImages,
+      pgCells,
+      pgScaleInput: st.pgScaleInput,
+      onScaleChange: (e) => this.onScaleChange(e.target.value),
+      pgSum: sum.toFixed(3),
+      pgSumNote: { display: Math.abs(sum) < 0.001 ? 'inline' : 'none', color: '#d97706' },
+      pgPresets,
+      onBack: () => this.setState({ screen: 'start' }),
+
+      onThreshold: () => this.setState({ screen: 'threshold' }),
+      thImages: this.IMG_OPTS.map(o => {
+        const sel = st.thImage === o.value;
+        return {
+          label: o.label,
+          onClick: () => this.setState({ thImage: o.value }),
+          style: { fontSize:'12px', padding:'6px 12px', cursor:'pointer', border: sel ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: sel ? '#fff5f1' : '#fcfbf8', color: sel ? '#b3300f' : '#56565c', fontWeight: sel ? 700 : 400 },
+        };
+      }),
+      thValue: st.thValue,
+      onThValue: (e) => this.setState({ thValue: parseInt(e.target.value, 10) }),
+      onThInvert: () => this.setState({ thInvert: !st.thInvert }),
+      thInvertStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', padding:'9px 14px', cursor:'pointer', border:'1.5px solid #1a1a1c', background: st.thInvert ? '#1a1a1c' : '#fcfbf8', color: st.thInvert ? '#fff' : '#1a1a1c', whiteSpace:'nowrap' },
+      onThOtsu: () => { const b = this.getSource(st.thImage, 236, 184); if (b) this.setState({ thValue: this.otsu(b) }); },
+      onThHistDown: (e) => { if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); this._thDown = true; const v = this.thValFromEvent(e); if (v != null) this.setState({ thValue: v }); },
+      onThHistMove: (e) => { if (!this._thDown) return; const v = this.thValFromEvent(e); if (v != null) this.setState({ thValue: v }); },
+      onThHistUp: () => { this._thDown = false; },
+      thRule: st.thInvert ? ('しきい値 ' + st.thValue + ' 未満を白に') : ('しきい値 ' + st.thValue + ' 以上を白に'),
+      thWhitePct: thWhitePct,
+      thBlackPct: (100 - parseFloat(thWhitePct)).toFixed(0),
+
+      onTonePG: () => this.setState({ screen: 'tonepg' }),
+      tcImages: this.IMG_OPTS.map(o => {
+        const sel = st.tcImage === o.value;
+        return { label: o.label, onClick: () => this.setState({ tcImage: o.value }),
+          style: { fontSize:'12px', padding:'6px 12px', cursor:'pointer', border: sel ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: sel ? '#fff5f1' : '#fcfbf8', color: sel ? '#b3300f' : '#56565c', fontWeight: sel ? 700 : 400 } };
+      }),
+      tcChannels: [
+        { id:'rgb', label:'RGB' }, { id:'r', label:'R' }, { id:'g', label:'G' }, { id:'b', label:'B' },
+      ].map(o => {
+        const sel = st.tcChannel === o.id;
+        const col = this.curveColor(o.id);
+        return { label: o.label, onClick: () => this.setState({ tcChannel: o.id }),
+          style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', padding:'5px 13px', cursor:'pointer', border: sel ? ('1.5px solid '+col) : '1px solid #d6d4ce', background: sel ? '#fff' : '#fcfbf8', color: sel ? col : '#56565c', fontWeight: sel ? 700 : 400 } };
+      }),
+      tcPresets: [
+        { label:'リセット', pts:[{in:0,out:0},{in:64,out:64},{in:128,out:128},{in:192,out:192},{in:255,out:255}] },
+        { label:'明るく', pts:[{in:0,out:0},{in:64,out:104},{in:128,out:176},{in:192,out:228},{in:255,out:255}] },
+        { label:'暗く', pts:[{in:0,out:0},{in:64,out:36},{in:128,out:84},{in:192,out:140},{in:255,out:210}] },
+        { label:'S字（高コント）', pts:[{in:0,out:0},{in:64,out:32},{in:128,out:128},{in:192,out:224},{in:255,out:255}] },
+        { label:'低コント', pts:[{in:0,out:48},{in:64,out:88},{in:128,out:128},{in:192,out:168},{in:255,out:208}] },
+        { label:'反転', pts:[{in:0,out:255},{in:64,out:191},{in:128,out:128},{in:192,out:64},{in:255,out:0}] },
+      ].map(o => ({ label: o.label, onClick: () => this.setState({ tcPoints: o.pts }),
+        style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'11px', padding:'5px 10px', cursor:'pointer', border:'1px solid #d6d4ce', background:'#fcfbf8', color:'#56565c' } })),
+      onTcDown: (e) => { if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); this._tcDown = true; this.tcPointFromEvent(e, true); },
+      onTcMove: (e) => { if (this._tcDown) this.tcPointFromEvent(e, false); },
+      onTcUp: () => { this._tcDown = false; this._tcIdx = null; },
+      onTcSmooth: () => this.setState({ tcSmooth: !st.tcSmooth }),
+      tcSmoothStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'11px', padding:'7px 13px', cursor:'pointer', border: st.tcSmooth ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: st.tcSmooth ? '#fff5f1' : '#fcfbf8', color: st.tcSmooth ? '#b3300f' : '#56565c', fontWeight: st.tcSmooth ? 700 : 400, marginTop:'8px', display:'inline-flex', alignItems:'center', gap:'8px', borderRadius:'4px', userSelect:'none' },
+      tcSmoothDot: { width:'12px', height:'12px', borderRadius:'50%', flex:'none', boxSizing:'border-box', border: st.tcSmooth ? '3.5px solid #e0411c' : '1.5px solid #b4b1a9', background:'#fff', transition:'border-color .12s' },
+
+      onGeoPG: () => this.setState({ screen: 'geopg' }),
+      gpImages: this.IMG_OPTS.map(o => {
+        const sel = st.gpImage === o.value;
+        return { label: o.label, onClick: () => this.setState({ gpImage: o.value }),
+          style: { fontSize:'12px', padding:'6px 12px', cursor:'pointer', border: sel ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: sel ? '#fff5f1' : '#fcfbf8', color: sel ? '#b3300f' : '#56565c', fontWeight: sel ? 700 : 400 } };
+      }),
+      gr00: gpR[0][0], gr01: gpR[0][1], gr02: gpR[0][2],
+      gr10: gpR[1][0], gr11: gpR[1][1], gr12: gpR[1][2],
+      gr20: gpR[2][0], gr21: gpR[2][1], gr22: gpR[2][2],
+      gm00: gpMm[0][0], gm01: gpMm[0][1], gm02: gpMm[0][2],
+      gm10: gpMm[1][0], gm11: gpMm[1][1], gm12: gpMm[1][2],
+      gm20: gpMm[2][0], gm21: gpMm[2][1], gm22: gpMm[2][2],
+      gpInputStyle: { width:'52px', padding:'7px 4px', textAlign:'center', fontFamily:"'JetBrains Mono',monospace", fontSize:'14px', fontWeight:700, color:'#141416', border:'1.5px solid #1a1a1c', background:'#fff' },
+      gpComposed: gpComp.flat().map(v => ({
+        v: (Math.round(v*100)/100).toString(),
+        style: { width:'56px', padding:'7px 4px', textAlign:'center', fontFamily:"'JetBrains Mono',monospace", fontSize:'14px', fontWeight:700, color:'#1a1a1c', background:'#f0ede6', border:'1px solid #d6d4ce' },
+      })),
+      onGr00: (e) => this.setGpCell('R',0,0,e.target.value),
+      onGr01: (e) => this.setGpCell('R',0,1,e.target.value),
+      onGr02: (e) => this.setGpCell('R',0,2,e.target.value),
+      onGr10: (e) => this.setGpCell('R',1,0,e.target.value),
+      onGr11: (e) => this.setGpCell('R',1,1,e.target.value),
+      onGr12: (e) => this.setGpCell('R',1,2,e.target.value),
+      onGr20: (e) => this.setGpCell('R',2,0,e.target.value),
+      onGr21: (e) => this.setGpCell('R',2,1,e.target.value),
+      onGr22: (e) => this.setGpCell('R',2,2,e.target.value),
+      onGm00: (e) => this.setGpCell('M',0,0,e.target.value),
+      onGm01: (e) => this.setGpCell('M',0,1,e.target.value),
+      onGm02: (e) => this.setGpCell('M',0,2,e.target.value),
+      onGm10: (e) => this.setGpCell('M',1,0,e.target.value),
+      onGm11: (e) => this.setGpCell('M',1,1,e.target.value),
+      onGm12: (e) => this.setGpCell('M',1,2,e.target.value),
+      onGm20: (e) => this.setGpCell('M',2,0,e.target.value),
+      onGm21: (e) => this.setGpCell('M',2,1,e.target.value),
+      onGm22: (e) => this.setGpCell('M',2,2,e.target.value),
+      gpDet: gpDet.toFixed(2),
+      gpDetNote: Math.abs(gpDet) < 1e-6 ? '面積0に潰れる（特異）' : (gpDet < 0 ? '面積比'+Math.abs(gpDet).toFixed(2)+'・鏡映あり' : '面積比 '+gpDet.toFixed(2)),
+      gpPresetsR: this.makeGpPresets('R'),
+      gpPresetsM: this.makeGpPresets('M'),
+      gpRotR: st.gpRotR, gpScaleR: st.gpScaleR,
+      gpRotM: st.gpRotM, gpScaleM: st.gpScaleM,
+      gpTxR: st.gpTxR, gpTyR: st.gpTyR,
+      gpTxM: st.gpTxM, gpTyM: st.gpTyM,
+      gpRotRLabel: Math.round(st.gpRotR) + '°',
+      gpScaleRLabel: st.gpScaleR.toFixed(2) + '×',
+      gpRotMLabel: Math.round(st.gpRotM) + '°',
+      gpScaleMLabel: st.gpScaleM.toFixed(2) + '×',
+      gpTxRLabel: st.gpTxR.toFixed(1),
+      gpTyRLabel: st.gpTyR.toFixed(1),
+      gpTxMLabel: st.gpTxM.toFixed(1),
+      gpTyMLabel: st.gpTyM.toFixed(1),
+      onGpRotR: (e) => this.applyGpTransform('R', { rot: parseFloat(e.target.value) }),
+      onGpScaleR: (e) => this.applyGpTransform('R', { scale: parseFloat(e.target.value) }),
+      onGpRotM: (e) => this.applyGpTransform('M', { rot: parseFloat(e.target.value) }),
+      onGpScaleM: (e) => this.applyGpTransform('M', { scale: parseFloat(e.target.value) }),
+      onGpTxR: (e) => this.applyGpTransform('R', { tx: parseFloat(e.target.value) }),
+      onGpTyR: (e) => this.applyGpTransform('R', { ty: parseFloat(e.target.value) }),
+      onGpTxM: (e) => this.applyGpTransform('M', { tx: parseFloat(e.target.value) }),
+      onGpTyM: (e) => this.applyGpTransform('M', { ty: parseFloat(e.target.value) }),
+
+      onFourier: () => this.setState({ screen: 'fourier' }),
+      fpImages: [{ value:'black', label:'黒（無地）' }, { value:'pat_vstripe', label:'縦縞' }, { value:'pat_concentric', label:'同心円' }].concat(this.IMG_OPTS).map(o => {
+        const sel = st.fpImage === o.value;
+        return {
+          label: o.label,
+          onClick: () => this.setState({ fpImage: o.value }),
+          style: { fontSize:'12px', padding:'6px 12px', cursor:'pointer', border: sel ? '1.5px solid #e0411c' : '1px solid #d6d4ce', background: sel ? '#fff5f1' : '#fcfbf8', color: sel ? '#b3300f' : '#56565c', fontWeight: sel ? 700 : 400 },
+        };
+      }),
+      fpDrawBrushes: [
+        { id:'white', label:'白を描く' },
+        { id:'black', label:'黒を描く' },
+      ].map((b, i) => {
+        const sel = st.fpBrush === b.id;
+        return {
+          label: b.label,
+          onClick: () => this.setState({ fpBrush: b.id }),
+          style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', padding:'8px 14px', cursor:'pointer', color: sel ? '#fff' : '#3a3a40', background: sel ? '#1a1a1c' : '#fcfbf8', fontWeight: sel ? 700 : 400, borderRight: i === 0 ? '1.5px solid #1a1a1c' : 'none' },
+        };
+      }),
+      fpFilterBrushes: [
+        { id:'cut',  label:'遮断' },
+        { id:'keep', label:'通過' },
+      ].map((b, i) => {
+        const sel = st.fpBrush === b.id;
+        return {
+          label: b.label,
+          onClick: () => this.setState({ fpBrush: b.id }),
+          style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', padding:'8px 14px', cursor:'pointer', color: sel ? '#fff' : '#b3300f', background: sel ? '#e0411c' : '#fff5f1', fontWeight: sel ? 700 : 400, borderRight: i === 0 ? '1.5px solid #e0411c' : 'none' },
+        };
+      }),
+      fpBrushSize: st.fpBrushSize,
+      onBrushSize: (e) => this.setState({ fpBrushSize: parseFloat(e.target.value) }),
+      fpBrushShapes: [
+        { id:'circle', label:'● 丸' },
+        { id:'square', label:'■ 四角' },
+      ].map((b, i) => {
+        const sel = st.fpBrushShape === b.id;
+        return {
+          label: b.label,
+          onClick: () => this.setState({ fpBrushShape: b.id }),
+          style: { fontFamily:"'JetBrains Mono',monospace", fontSize:'12px', padding:'8px 14px', cursor:'pointer', color: sel ? '#fff' : '#3a3a40', background: sel ? '#56565c' : '#fcfbf8', fontWeight: sel ? 700 : 400, borderRight: i === 0 ? '1.5px solid #1a1a1c' : 'none' },
+        };
+      }),
+      onFpReload: () => this.applyFourierPreset('reload'),
+      fpPresets: [
+        { name:'allpass',   label:'フィルタ解除' },
+        { name:'low',       label:'ローパス' },
+        { name:'high',      label:'ハイパス' },
+        { name:'band',      label:'バンドパス' },
+      ].map((p, i, arr) => {
+        const cols = arr.length;
+        const lastCol = (i % cols === cols - 1);
+        return {
+          num: String(i + 1).padStart(2, '0'),
+          label: p.label,
+          onClick: () => this.applyFourierPreset(p.name),
+          numStyle: { fontFamily:"'JetBrains Mono',monospace", fontSize:'10px', color:'#bdbdc2' },
+          style: { padding:'11px 10px', fontSize:'12px', cursor:'pointer', color:'#3a3a40', borderRight: lastCol ? 'none' : '1px solid #e2e0da' },
+        };
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>
