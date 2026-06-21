@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometricQuizzes, realImageQuizzes, kernelReverseQuizzes } from './quizzes'
+import { allQuizzes, toneCurveQuizzes, kernelQuizzes, thresholdQuizzes, geometricQuizzes, realImageQuizzes, kernelReverseQuizzes, fourierQuizzes, frequencyQuizzes } from './quizzes'
 import type { Quiz } from './quizzes'
 import QuizSession from './components/QuizSession'
 import ResultScreen from './components/ResultScreen'
@@ -7,8 +7,9 @@ import KernelPlayground from './components/KernelPlayground'
 import ThresholdPlayground from './components/ThresholdPlayground'
 import ToneCurvePlayground from './components/ToneCurvePlayground'
 import GeometricPlayground from './components/GeometricPlayground'
+import FourierPlayground from './components/FourierPlayground'
 
-type Screen = 'start' | 'quiz' | 'result' | 'playground' | 'threshold' | 'tonepg' | 'geopg'
+type Screen = 'start' | 'quiz' | 'result' | 'playground' | 'threshold' | 'tonepg' | 'geopg' | 'fourier'
 
 type Category = {
   id: string
@@ -17,13 +18,15 @@ type Category = {
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'all',           label: 'すべて（全42問）',                quizzes: allQuizzes },
+  { id: 'all',           label: 'すべて（全55問）',                quizzes: allQuizzes },
   { id: 'toneCurve',     label: 'トーンカーブ（5問）',              quizzes: toneCurveQuizzes },
   { id: 'kernel',        label: 'カーネルフィルタ（7問）',          quizzes: kernelQuizzes },
   { id: 'threshold',     label: '二値化・形態学（3問）',            quizzes: thresholdQuizzes },
   { id: 'geometric',     label: '幾何学変換（8問）',                quizzes: geometricQuizzes },
   { id: 'realImage',     label: 'フリー画像クイズ（12問）',         quizzes: realImageQuizzes },
   { id: 'kernelReverse', label: 'カーネル逆問題（7問）',            quizzes: kernelReverseQuizzes },
+  { id: 'fourier',       label: 'フーリエ変換（9問）',              quizzes: fourierQuizzes },
+  { id: 'frequency',     label: '周波数フィルタリング（4問）',       quizzes: frequencyQuizzes },
 ]
 
 export default function App() {
@@ -61,6 +64,10 @@ export default function App() {
 
   if (screen === 'geopg') {
     return <GeometricPlayground onBack={() => setScreen('start')} />
+  }
+
+  if (screen === 'fourier') {
+    return <FourierPlayground onBack={() => setScreen('start')} />
   }
 
   if (screen === 'quiz') {
@@ -205,6 +212,24 @@ export default function App() {
         }}
       >
         ⊞ GEOMETRIC 行列変換
+      </button>
+      <button
+        onClick={() => setScreen('fourier')}
+        style={{
+          marginTop: '0.75rem',
+          width: '100%',
+          padding: '0.875rem',
+          background: '#fcfbf8',
+          color: '#1a1a1c',
+          border: '1.5px solid #1a1a1c',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          fontFamily: "'JetBrains Mono', monospace",
+          cursor: 'pointer',
+        }}
+      >
+        ∿ FOURIER フーリエ変換
       </button>
     </div>
   )

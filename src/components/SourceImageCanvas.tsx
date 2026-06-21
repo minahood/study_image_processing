@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { generateSourceImage } from '../processors/testImages'
 import { loadImage, isRealImage, realImagePath } from '../processors/imageLoader'
+import { patternSourceImage } from '../processors/fft'
 import { allQuizzes } from '../quizzes'
 
 type Props = {
@@ -40,7 +41,15 @@ export default function SourceImageCanvas({
 
     const applyAxes = () => { if (drawAxesFn) drawAxesFn(ctx, width, height) }
 
-    if (isRealImage(type)) {
+    if (type.startsWith('pat_')) {
+      const img = patternSourceImage(type.slice(4), width)
+      const off = document.createElement('canvas')
+      off.width = img.width; off.height = img.height
+      off.getContext('2d')!.putImageData(img, 0, 0)
+      ctx.clearRect(0, 0, width, height)
+      ctx.drawImage(off, 0, 0, width, height)
+      applyAxes()
+    } else if (isRealImage(type)) {
       // Show loading state
       ctx.fillStyle = '#e5e7eb'
       ctx.fillRect(0, 0, width, height)
