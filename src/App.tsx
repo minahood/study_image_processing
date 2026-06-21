@@ -4,8 +4,11 @@ import type { Quiz } from './quizzes'
 import QuizSession from './components/QuizSession'
 import ResultScreen from './components/ResultScreen'
 import KernelPlayground from './components/KernelPlayground'
+import ThresholdPlayground from './components/ThresholdPlayground'
+import ToneCurvePlayground from './components/ToneCurvePlayground'
+import GeometricPlayground from './components/GeometricPlayground'
 
-type Screen = 'start' | 'quiz' | 'result' | 'playground'
+type Screen = 'start' | 'quiz' | 'result' | 'playground' | 'threshold' | 'tonepg' | 'geopg'
 
 type Category = {
   id: string
@@ -46,6 +49,18 @@ export default function App() {
 
   if (screen === 'playground') {
     return <KernelPlayground onBack={() => setScreen('start')} />
+  }
+
+  if (screen === 'threshold') {
+    return <ThresholdPlayground onBack={() => setScreen('start')} />
+  }
+
+  if (screen === 'tonepg') {
+    return <ToneCurvePlayground onBack={() => setScreen('start')} />
+  }
+
+  if (screen === 'geopg') {
+    return <GeometricPlayground onBack={() => setScreen('start')} />
   }
 
   if (screen === 'quiz') {
@@ -136,6 +151,60 @@ export default function App() {
         }}
       >
         🔬 カーネルプレイグラウンド
+      </button>
+      <button
+        onClick={() => setScreen('threshold')}
+        style={{
+          marginTop: '0.75rem',
+          width: '100%',
+          padding: '0.875rem',
+          background: '#fcfbf8',
+          color: '#1a1a1c',
+          border: '1.5px solid #1a1a1c',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          fontFamily: "'JetBrains Mono', monospace",
+          cursor: 'pointer',
+        }}
+      >
+        ◧ THRESHOLD 二値化
+      </button>
+      <button
+        onClick={() => setScreen('tonepg')}
+        style={{
+          marginTop: '0.75rem',
+          width: '100%',
+          padding: '0.875rem',
+          background: '#fcfbf8',
+          color: '#1a1a1c',
+          border: '1.5px solid #1a1a1c',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          fontFamily: "'JetBrains Mono', monospace",
+          cursor: 'pointer',
+        }}
+      >
+        ⟋ TONE CURVE トーンカーブ
+      </button>
+      <button
+        onClick={() => setScreen('geopg')}
+        style={{
+          marginTop: '0.75rem',
+          width: '100%',
+          padding: '0.875rem',
+          background: '#fcfbf8',
+          color: '#1a1a1c',
+          border: '1.5px solid #1a1a1c',
+          borderRadius: '8px',
+          fontSize: '1.05rem',
+          fontWeight: 'bold',
+          fontFamily: "'JetBrains Mono', monospace",
+          cursor: 'pointer',
+        }}
+      >
+        ⊞ GEOMETRIC 行列変換
       </button>
     </div>
   )

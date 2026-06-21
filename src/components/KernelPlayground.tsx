@@ -52,6 +52,9 @@ const IMAGE_OPTIONS = [
   { value: 'summer',        label: 'サマービーチ（summer）' },
   { value: 'shapes',        label: '図形（shapes）' },
   { value: 'blue_kikagaku', label: '幾何学模様（blue_kikagaku）' },
+  { value: 'fence',         label: '金網（fence）' },
+  { value: 'metal',         label: '金属（metal）' },
+  { value: 'pebbles',       label: '小石（pebbles）' },
   { value: 'checker',       label: 'チェッカー（生成）' },
   { value: 'gradient',      label: 'グラデーション（生成）' },
 ]

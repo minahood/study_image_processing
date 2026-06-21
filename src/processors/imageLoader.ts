@@ -30,7 +30,7 @@ export async function loadImage(path: string, width = 200, height = 200): Promis
 }
 
 export function isRealImage(type: string): boolean {
-  return ['bud', 'momiji', 'summer', 'shapes', 'blue_kikagaku'].includes(type)
+  return ['bud', 'momiji', 'summer', 'shapes', 'blue_kikagaku', 'fence', 'metal', 'pebbles'].includes(type)
 }
 
 export function realImagePath(type: string): string {
